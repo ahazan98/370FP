@@ -4,7 +4,7 @@ class gameTree:
     def __init__(self,numHands, numFingers):
         self.numHands = numHands
         self.numFingers = numFingers
-        self.root = state(player(numHands, numFingers), player(numHands, numFingers),1)
+        self.root = state(player(numHands, numFingers), player(numHands, numFingers),0)
 
 
 #State has two players 
@@ -17,6 +17,16 @@ class state:
         return ("Player 1's state: " + str(self.players[0].hands) + 
             "\nPlayer 2's state: " + str(self.players[1].hands) + 
             "\nPlayer " + str(self.turn) + "'s turn")
+
+    def copyState(self):
+        newPlayer1 = player(self.player1.numHands, self.player1.numFingers)
+        newPlayer2 = player(self.player2.numHands, self.player2.numFingers)
+        newPlayer1.hands = self.player1.hands[:]
+        newPlayer2.hands = self.player2.hands[:]
+        if(self.turn == 0):
+            return state(newPlayer1, newPlayer2, 1)
+        else:
+            return state(newPlayer1, newPlayer2, 0)
     
     def checkWin(self):
         if sum(self.players[self.turn].hands) == 0:
@@ -44,11 +54,16 @@ class state:
 class player:
     def __init__(self, numHands, numFingers):
         self.hands = []
+        self.numHands = numHands
         self.numFingers = numFingers
         for i in range(numHands):
             self.hands.append(1)
     
     def receiveMove(self, hand, number):
+        if self.hands[hand] == 0:
+            print("This hand is already out!")
+            return
+    
         newVal = (self.hands[hand] + number) % self.numFingers
         self.hands[hand] = newVal
     
