@@ -5,19 +5,50 @@ class gameTree:
         self.numHands = numHands
         self.numFingers = numFingers
         self.root = state(player(numHands, numFingers), player(numHands, numFingers),0)
-
+        self.allStates = set()
+        self.allStates.add(self.root)
 
 #State has two players
 class state:
     def __init__(self, player1, player2, turn):
         self.players = [player1, player2]
         self.turn = turn
+        self.states = []
 
     def __str__(self):
         return ("Player 1's state: " + str(self.players[0].hands) +
             "\nPlayer 2's state: " + str(self.players[1].hands) +
             "\nPlayer " + str(self.turn) + "'s turn")
 
+    def __eq__(self, other):
+        p1s1Hands = {}
+        p2s1Hands = {}
+        p1s2Hands = {}
+        p2s2Hands = {}
+        for hand in range(len(self.players[0].hands)):
+            if(self.players[0].hands[hand] in p1s1Hands):
+                p1s1Hands[self.players[0].hands[hand]] += 1
+            else:
+                p1s1Hands[self.players[0].hands[hand]] = 1
+            if(self.players[1].hands[hand] in p2s1Hands):
+                p2s1Hands[self.players[1].hands[hand]] += 1
+            else:
+                p2s1Hands[self.players[1].hands[hand]] = 1
+            if(other.players[0].hands[hand] in p1s2Hands):
+                p1s2Hands[other.players[0].hands[hand]] += 1
+            else:
+                p1s2Hands[other.players[0].hands[hand]] = 1
+            if(other.players[1].hands[hand] in p2s2Hands):
+                p2s2Hands[other.players[1].hands[hand]] += 1
+            else:
+                p2s2Hands[other.players[1].hands[hand]] = 1
+        if(p1s1Hands == p1s2Hands and p2s1Hands == p2s2Hands):
+            return True
+        else:
+            return False
+
+    def __hash__(self):
+        return hash(tuple(self.players[0].hands)) + hash(tuple(self.players[1].hands))
     def copyState(self):
         newPlayer1 = player(self.players[0].numHands, self.players[0].numFingers)
         newPlayer2 = player(self.players[1].numHands, self.players[1].numFingers)
@@ -39,16 +70,16 @@ class state:
         playerMoves = set()
 
         for i in range(len(self.players[self.turn].hands)):
-
-            #if((self.players[self.turn].hands[i] not in playerMoves)):
-                playerMoves.add(self.players[self.turn].hands[i])
-                #print(self.players[self.turn].hands[i])
-                for j in range(len(self.players[self.turn].hands)):
-
-
+            for j in range(len(self.players[self.turn].hands)):
+                if((self.players[self.turn].hands[i] not in playerMoves)):
+                    playerMoves.add(self.players[self.turn].hands[i])
                     copy = self.copyState()
 
                     copy.makeTurn(i, j, False)
+                    if(copy.turn == 0):
+                        copy.turn = 1
+                    else:
+                        copy.turn = 0
                     possibleStates.append(copy)
         copy = self.copyState()
         copy.makeTurn(0,0, True)
@@ -88,25 +119,45 @@ class player:
 
     def receiveMove(self, hand, number):
         if self.hands[hand] == 0:
-            print("This hand is already out!")
+
             return
 
         newVal = (self.hands[hand] + number) % self.numFingers
         self.hands[hand] = newVal
 
+def expandTree(tree):
+    root = tree.root
+    allStates = tree.allStates
+    stack = root.expandStates()
+    while(len(stack) > 0):
+        currentRoot = stack.pop()
+        if(currentRoot not in allStates):
+            allStates.add(currentRoot)
+            stack.extend(currentRoot.expandStates())
+    return allStates
 
 def main():
-    gameT = gameTree(2, 5)
+    gameT = gameTree(80, 5)
     print(gameT.root)
-    print("----")
-    #gameT.root.makeTurn(gameT.root.turn,1,False)
-    copy = gameT.root.copyState()
-    gameT.root.players[0].hands[1] = 4
-    states = gameT.root.expandStates()
-    print("_____")
-    for state in states:
-        print(state)
 
+    numStates = len(gameT.allStates)
+    print(numStates)
+    copy = gameT.root.copyState()
+
+
+    gameT.allStates = expandTree(gameT)
+    gameT.allStates.add(gameT.root)
+
+    #gameT.root.states = gameT.root.expandStates()
+    print("_____")
+    for state in gameT.allStates:
+        print(state)
+        if(state.checkWin()):
+            print("_______")
+            print("Victory")
+            print("_______")
+
+    print(len(gameT.allStates))
 
 if __name__ == "__main__":
     main()
