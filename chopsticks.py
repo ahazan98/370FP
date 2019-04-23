@@ -1,4 +1,6 @@
-
+import math
+import time
+import random
 #Game Tree, each node is a state
 class gameTree:
     def __init__(self,numHands, numFingers):
@@ -62,7 +64,7 @@ class state:
 
     def evaluateScore(self, turn):
         score = 0
-        if(self.checkWin()):
+        if(self.checkLose()):
 
             if(self.turn == 0):
                 score = self.players[0].numHands * -10000
@@ -89,7 +91,7 @@ class state:
         return score
 
 
-    def checkWin(self):
+    def checkLose(self):
         if(self.turn == 0):
             if sum(self.players[0].hands) == 0:
                 return True
@@ -103,9 +105,18 @@ class state:
 
 
     def expandStates(self):
-        possibleStates = []
+        possibleStates = set()
         playerMoves = set()
-
+        copy = self.copyState()
+        if( not copy.allSame()):
+            copy.makeTurn(0,0, True)
+            if(copy.turn == 0):
+                copy.turn = 1
+                copy.evaluateScore(1)
+            else:
+                copy.turn = 0
+                copy.evaluateScore(0)
+                possibleStates.add(copy)
         for i in range(len(self.players[self.turn].hands)):
             for j in range(len(self.players[self.turn].hands)):
                 if((self.players[self.turn].hands[i] not in playerMoves)):
@@ -120,18 +131,25 @@ class state:
                         copy.turn = 0
                         copy.score = copy.evaluateScore(0)
 
-                    possibleStates.append(copy)
-        copy = self.copyState()
-        copy.makeTurn(0,0, True)
-        if(copy.turn == 0):
-            copy.turn = 1
-            copy.evaluateScore(1)
-        else:
-            copy.turn = 0
-            copy.evaluateScore(0)
-        possibleStates.append(copy)
+                    possibleStates.add(copy)
+
         return possibleStates
 
+    def allSame(self):
+
+
+        if self.turn == 0:
+            prev = self.players[0].hands[0]
+            for hand in self.players[0].hands:
+                if(hand != prev):
+                    return False
+            return True
+        else:
+            prev = self.players[1].hands[0]
+            for hand in self.players[1].hands:
+                if(hand != prev):
+                    return False
+            return True
 
 
 
@@ -184,10 +202,51 @@ def expandTree(tree):
     return allStates
 
 
+def ABMove(state, depth, alpha, beta, depthLimit):
+    if(depth == depthLimit or state.checkLose()):
+        return (state, state.evaluateScore(state.turn))
+    states = state.expandStates()
+    if(state.turn == 0):
+        bestVal = float("-inf")
+        for Nstate in states:
+            value = ABMove(Nstate, depth+1, alpha, beta, depthLimit)[1]
+            bestVal = max(value, bestVal)
+            alpha = max(alpha, bestVal)
+            if beta <= alpha:
+                break
+        return (Nstate, bestVal)
+    else:
+        bestVal = float("inf")
+        for Nstate in states:
+            value = ABMove(Nstate, depth+1, alpha, beta, depthLimit)[1]
+            bestVal = min(value, bestVal)
+            beta = min(beta, bestVal)
+            if beta >= alpha:
+                break
+        return (Nstate, bestVal)
+
+
+def playGame(currentRoot):
+
+
+    while(not currentRoot.checkLose()):
+        if(currentRoot.turn == 0):
+            currentRoot = ABMove(currentRoot, 0,float("-inf"),float("inf"), 10)[0]
+            print(currentRoot)
+        else:
+            currentRoot = ABMove(currentRoot, 0,float("-inf"),float("inf"), 1)[0]
+            print(currentRoot)
+        # time.sleep(2)
+    if(currentRoot.turn == 0):
+        print(currentRoot)
+        print("Player 1 has won")
+    else:
+        print(currentRoot)
+        print("Player 2 has won")
 
 
 def main():
-    gameT = gameTree(2, 5)
+    gameT = gameTree(4, 5)
 
     numStates = len(gameT.allStates)
     #print(numStates)
@@ -195,27 +254,31 @@ def main():
 
 
     #print(copy.evaluateScore(copy.turn))
-    gameT.allStates = expandTree(gameT)
+    #gameT.allStates = expandTree(gameT)
     gameT.allStates.add(gameT.root)
+    state = ABMove(gameT.root, 0, float("-inf"), float("inf"), 10)[0]
+    # print(state)
+    # state = ABMove(state,0, float("-inf"), float("inf"), 10)[0]
+    # print(state)
 
+    playGame(gameT.root)
+    #gameT.root.states = gameT.root.expandStates()
 
-    gameT.root.states = gameT.root.expandStates()
-
-
-    print("_____")
-    for state in gameT.allStates:
-        print(state)
-        print(state.score)
-
-        if(state.checkWin()):
-
-            print("_______")
-            print("Victory")
-            print("_______")
-
-
-
-
-    print(len(gameT.allStates))
+    #
+    # print("_____")
+    # for state in gameT.allStates:
+    #     print(state)
+    #     print(state.score)
+    #
+    #     if(state.checkLose()):
+    #
+    #         print("_______")
+    #         print("Victory")
+    #         print("_______")
+    #
+    #
+    #
+    #
+    # print(len(gameT.allStates))
 if __name__ == "__main__":
     main()
