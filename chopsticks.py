@@ -5,6 +5,7 @@ class gameTree:
         self.numHands = numHands
         self.numFingers = numFingers
         self.root = state(player(numHands, numFingers), player(numHands, numFingers),0)
+        self.root.score = 0
         self.allStates = set()
         self.allStates.add(self.root)
 
@@ -14,11 +15,12 @@ class state:
         self.players = [player1, player2]
         self.turn = turn
         self.states = []
+        self.score = 0
 
     def __str__(self):
         return ("Player 1's state: " + str(self.players[0].hands) +
             "\nPlayer 2's state: " + str(self.players[1].hands) +
-            "\nPlayer " + str(self.turn) + "'s turn")
+            "\nPlayer " + str(self.turn +1) + "'s turn")
 
     def __eq__(self, other):
         p1s1Hands = {}
@@ -58,13 +60,48 @@ class state:
 
         return state(newPlayer1, newPlayer2, self.turn)
 
+    def evaluateScore(self, turn):
+        score = 0
+        if(self.checkWin()):
+
+            if(self.turn == 0):
+                score = self.players[0].numHands * -10000
+
+            else:
+
+                score = self.players[1].numHands * 10000
+
+
+
+
+        for i in self.players[0].hands:
+            if(i == 0):
+                score -= 100
+            elif(float(i) >= .75 * self.players[0].numFingers):
+                score -= 25
+
+        for i in self.players[1].hands:
+            if(i == 0):
+                score += 100
+            elif(float(i) >= .75 * self.players[1].numFingers):
+                score += 25
+
+        return score
+
 
     def checkWin(self):
-        if sum(self.players[self.turn].hands) == 0:
-            if self.turn == 0:
-                return ("Player 2 has won!!!")
+        if(self.turn == 0):
+            if sum(self.players[0].hands) == 0:
+                return True
             else:
-                return "Player 1 has won!!!"
+                return False
+        else:
+            if sum(self.players[1].hands) == 0:
+                return True
+            else:
+                return False
+
+
     def expandStates(self):
         possibleStates = []
         playerMoves = set()
@@ -78,13 +115,23 @@ class state:
                     copy.makeTurn(i, j, False)
                     if(copy.turn == 0):
                         copy.turn = 1
+                        copy.score = copy.evaluateScore(1)
                     else:
                         copy.turn = 0
+                        copy.score = copy.evaluateScore(0)
+
                     possibleStates.append(copy)
         copy = self.copyState()
         copy.makeTurn(0,0, True)
+        if(copy.turn == 0):
+            copy.turn = 1
+            copy.evaluateScore(1)
+        else:
+            copy.turn = 0
+            copy.evaluateScore(0)
         possibleStates.append(copy)
         return possibleStates
+
 
 
 
@@ -136,28 +183,39 @@ def expandTree(tree):
             stack.extend(currentRoot.expandStates())
     return allStates
 
+
+
+
 def main():
-    gameT = gameTree(80, 5)
-    print(gameT.root)
+    gameT = gameTree(2, 5)
 
     numStates = len(gameT.allStates)
-    print(numStates)
+    #print(numStates)
     copy = gameT.root.copyState()
 
 
+    #print(copy.evaluateScore(copy.turn))
     gameT.allStates = expandTree(gameT)
     gameT.allStates.add(gameT.root)
 
-    #gameT.root.states = gameT.root.expandStates()
+
+    gameT.root.states = gameT.root.expandStates()
+
+
     print("_____")
     for state in gameT.allStates:
         print(state)
+        print(state.score)
+
         if(state.checkWin()):
+
             print("_______")
             print("Victory")
             print("_______")
 
-    print(len(gameT.allStates))
 
+
+
+    print(len(gameT.allStates))
 if __name__ == "__main__":
     main()
