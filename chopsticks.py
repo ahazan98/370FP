@@ -73,9 +73,15 @@ class state:
 
                 score = self.players[1].numHands * 10000
 
-
-
-
+        numDead = 0
+        for i in self.players[0].hands:
+            for j in self.players[1].hands:
+                if(i+j >= self.players[0].numFingers):
+                    numDead += 1
+        if(turn == 0):
+            score += 50 * numDead
+        else:
+            score -= 50 * numDead
         for i in self.players[0].hands:
             if(i == 0):
                 score -= 100
@@ -107,6 +113,28 @@ class state:
     def expandStates(self):
         possibleStates = set()
         playerMoves = set()
+
+        for i in range(len(self.players[self.turn].hands)):
+            # if(0 < self.players[self.turn].hands[i]):
+                for j in range(len(self.players[self.turn].hands)):
+                    # if((self.players[self.turn].hands[i] not in playerMoves)):
+                    oHand = self.players[self.turn].hands[i]
+                    dHand = self.players[(self.turn + 1) % 2].hands[j]
+                    tuple = (oHand, dHand)
+                    if tuple not in playerMoves and oHand != 0:
+                        playerMoves.add(tuple)
+                        # playerMoves.add(self.players[self.turn].hands[i])
+                        copy = self.copyState()
+
+                        copy.makeTurn(i, j, False)
+                        if(copy.turn == 0):
+                            copy.turn = 1
+                            copy.score = copy.evaluateScore(1)
+                        else:
+                            copy.turn = 0
+                            copy.score = copy.evaluateScore(0)
+
+                        possibleStates.add(copy)
         copy = self.copyState()
         if( not copy.allSame()):
             copy.makeTurn(0,0, True)
@@ -117,21 +145,6 @@ class state:
                 copy.turn = 0
                 copy.evaluateScore(0)
                 possibleStates.add(copy)
-        for i in range(len(self.players[self.turn].hands)):
-            for j in range(len(self.players[self.turn].hands)):
-                if((self.players[self.turn].hands[i] not in playerMoves)):
-                    playerMoves.add(self.players[self.turn].hands[i])
-                    copy = self.copyState()
-
-                    copy.makeTurn(i, j, False)
-                    if(copy.turn == 0):
-                        copy.turn = 1
-                        copy.score = copy.evaluateScore(1)
-                    else:
-                        copy.turn = 0
-                        copy.score = copy.evaluateScore(0)
-
-                    possibleStates.add(copy)
 
         return possibleStates
 
@@ -156,6 +169,7 @@ class state:
 
     def makeTurn(self, handM, handR, split):
         if split:
+
             total = sum(self.players[self.turn].hands)
             value = int (total / self.players[self.turn].numHands)
             leftover = total % self.players[self.turn].numHands
@@ -187,7 +201,9 @@ class player:
 
             return
 
-        newVal = (self.hands[hand] + number) % self.numFingers
+        newVal = (self.hands[hand] + number)
+        if(newVal >= self.numFingers):
+            newVal = 0
         self.hands[hand] = newVal
 
 def expandTree(tree):
@@ -228,25 +244,36 @@ def ABMove(state, depth, alpha, beta, depthLimit):
 
 def playGame(currentRoot):
 
-
+    count = 0
     while(not currentRoot.checkLose()):
         if(currentRoot.turn == 0):
-            currentRoot = ABMove(currentRoot, 0,float("-inf"),float("inf"), 10)[0]
+            currentRoot = ABMove(currentRoot, 0,float("-inf"),float("inf"), 4)[0]
             print(currentRoot)
+            print()
         else:
-            currentRoot = ABMove(currentRoot, 0,float("-inf"),float("inf"), 1)[0]
+            currentRoot = ABMove(currentRoot, 0,float("-inf"),float("inf"), 5)[0]
             print(currentRoot)
-        # time.sleep(2)
+            print()
+        # states = currentRoot.expandStates()
+        # for state in states:
+        #     if(state == currentRoot):
+        #         print("same")
+        # time.sleep(2
+        count+= 1
+
+        print(count)
+        print()
     if(currentRoot.turn == 0):
         print(currentRoot)
-        print("Player 1 has won")
+        print("Player 2 has won")
     else:
         print(currentRoot)
-        print("Player 2 has won")
+        print("Player 1 has won")
+
 
 
 def main():
-    gameT = gameTree(4, 5)
+    gameT = gameTree(5, 10)
 
     numStates = len(gameT.allStates)
     #print(numStates)
