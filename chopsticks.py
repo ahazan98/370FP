@@ -53,6 +53,10 @@ class state:
 
     def __hash__(self):
         return hash(tuple(self.players[0].hands)) + hash(tuple(self.players[1].hands))
+    
+    '''
+    return the copy of a state
+    '''
     def copyState(self):
         newPlayer1 = player(self.players[0].numHands, self.players[0].numFingers)
         newPlayer2 = player(self.players[1].numHands, self.players[1].numFingers)
@@ -62,6 +66,10 @@ class state:
 
         return state(newPlayer1, newPlayer2, self.turn)
 
+
+    '''
+    score a state we need to revisit this...... I don't think we need the turn parameter
+    '''
     def evaluateScore(self, turn):
         score = 0
         if(self.checkLose()):
@@ -96,7 +104,9 @@ class state:
 
         return score
 
-
+    '''
+    check if a player has lost the game
+    '''
     def checkLose(self):
         if(self.turn == 0):
             if sum(self.players[0].hands) == 0:
@@ -109,10 +119,13 @@ class state:
             else:
                 return False
 
-
+    '''
+    looks into all the possible moves a player can take in a certain state
+    '''
     def expandStates(self):
         possibleStates = set()
         playerMoves = set()
+        # print("here")
 
         for i in range(len(self.players[self.turn].hands)):
             # if(0 < self.players[self.turn].hands[i]):
@@ -121,35 +134,43 @@ class state:
                     oHand = self.players[self.turn].hands[i]
                     dHand = self.players[(self.turn + 1) % 2].hands[j]
                     tuple = (oHand, dHand)
-                    if tuple not in playerMoves and oHand != 0:
+                    if tuple not in playerMoves and oHand != 0 and dHand != 0:
                         playerMoves.add(tuple)
                         # playerMoves.add(self.players[self.turn].hands[i])
                         copy = self.copyState()
-
+                        # print("turn before move " + str(copy.turn))
                         copy.makeTurn(i, j, False)
+                        # print("turn after move "  + str(copy.turn))
+                    
                         if(copy.turn == 0):
-                            copy.turn = 1
                             copy.score = copy.evaluateScore(1)
                         else:
-                            copy.turn = 0
                             copy.score = copy.evaluateScore(0)
-
-                        possibleStates.add(copy)
+                        if copy != self:
+                            possibleStates.add(copy)
         copy = self.copyState()
-        if( not copy.allSame()):
+        if(not copy.allSame()):
+            # print("turn before split " + str(copy.turn))
+
             copy.makeTurn(0,0, True)
+            # print("turn after split"  + str(copy.turn))
+
             if(copy.turn == 0):
-                copy.turn = 1
-                copy.evaluateScore(1)
+                copy.evaluateScore(0) #changed from 1 to 0.... is this change for the next state?
+                if copy != self:
+                    possibleStates.add(copy)
             else:
-                copy.turn = 0
-                copy.evaluateScore(0)
-                possibleStates.add(copy)
+                # print("changing turn")
+                copy.evaluateScore(1) #changed from 0 to 1... is this chcange for the next state?
+                if copy != self:
+                    possibleStates.add(copy)
 
         return possibleStates
 
+    '''
+    Tests to see if all of a player's hands are the same
+    '''
     def allSame(self):
-
 
         if self.turn == 0:
             prev = self.players[0].hands[0]
@@ -166,7 +187,11 @@ class state:
 
 
 
-
+    '''
+    Encodes making a turn, if they decide to split, distribute the number of fingers 
+    evenly among the hands of the player. If they decide to make the move, the receiving
+    player will take the move
+    '''
     def makeTurn(self, handM, handR, split):
         if split:
 
@@ -185,6 +210,10 @@ class state:
             else:
                 receiving = self.players[1]
             receiving.receiveMove(handR, offense.hands[handM])
+        if self.turn == 0:
+            self.turn = 1
+        else:
+            self.turn = 0
 
 
 #player has their hand values
@@ -196,16 +225,23 @@ class player:
         for i in range(numHands):
             self.hands.append(1)
 
+    '''
+    player receives a move on their hand
+    '''
     def receiveMove(self, hand, number):
         if self.hands[hand] == 0:
 
             return
 
-        newVal = (self.hands[hand] + number)
+        newVal = (self.hands[hand] + number) 
+        # newVal = (self.hands[hand] + number) % self.numFingers #maybe include spillover?
         if(newVal >= self.numFingers):
             newVal = 0
         self.hands[hand] = newVal
 
+'''
+Expands the entire game tree.... not used in implementation of algorithms
+'''
 def expandTree(tree):
     root = tree.root
     allStates = tree.allStates
@@ -217,11 +253,16 @@ def expandTree(tree):
             stack.extend(currentRoot.expandStates())
     return allStates
 
-
-def ABMove(state, depth, alpha, beta, depthLimit):
+# Algorithm that takes in a state and will perform minimax with Alpha-beta pruning on it,
+# returning the ideal next state and the evaluated score of the state
+def ABMove(state, depth, alpha, beta, depthLimit): 
+    
     if(depth == depthLimit or state.checkLose()):
         return (state, state.evaluateScore(state.turn))
     states = state.expandStates()
+    # for state in states:
+    #     print("state: ")
+    #     print(state)
     if(state.turn == 0):
         bestVal = float("-inf")
         for Nstate in states:
@@ -247,13 +288,15 @@ def playGame(currentRoot):
     count = 0
     while(not currentRoot.checkLose()):
         if(currentRoot.turn == 0):
-            currentRoot = ABMove(currentRoot, 0,float("-inf"),float("inf"), 4)[0]
+            currentRoot = ABMove(currentRoot, 0,float("-inf"),float("inf"), 16)[0]
+            print("MADE MOVE")
             print(currentRoot)
-            print()
         else:
-            currentRoot = ABMove(currentRoot, 0,float("-inf"),float("inf"), 5)[0]
+            currentRoot = ABMove(currentRoot, 0,float("-inf"),float("inf"), 9)[0]
+            print("MADE MOVE")
+
             print(currentRoot)
-            print()
+            
         # states = currentRoot.expandStates()
         # for state in states:
         #     if(state == currentRoot):
@@ -273,29 +316,55 @@ def playGame(currentRoot):
 
 
 def main():
-    gameT = gameTree(5, 10)
+    gameT = gameTree(3, 20)
 
     numStates = len(gameT.allStates)
-    #print(numStates)
     copy = gameT.root.copyState()
+    # print(copy)
+    # print(copy.turn)
 
+    ##### PLAY AB GAME #####
+    # playGame(gameT.root)
 
-    #print(copy.evaluateScore(copy.turn))
-    #gameT.allStates = expandTree(gameT)
-    gameT.allStates.add(gameT.root)
-    state = ABMove(gameT.root, 0, float("-inf"), float("inf"), 10)[0]
-    # print(state)
+    ##### TEST EXPANDSTATES() #####
+    # states = copy.expandStates()
+    # for state in states:
+    #     print(state)
+
+    ##### COLLECTION OF AB MOVES ######
+    print("pre turn: " + str(copy.turn))
+    nextState = ABMove(copy, 0,float("-inf"),float("inf"), 5)[0]
+    print(nextState)
+    print("post turn: " + str(nextState.turn))
+
+    nextState = ABMove(nextState, 0,float("-inf"),float("inf"), 5)[0]
+    print
+    print(nextState)
+
+    ##### TESTING MAKE MOVE ANYWAYS ###### (this works, but why doesn't it change with evaluate state?)
+    # print(copy)
+    # copy.makeTurn(0,0,False)
+    # print(copy)
+
+    
+    
+    # print(gameT.root)
+
+    
+    # gameT.allStates.add(gameT.root)
+    # state = ABMove(gameT.root, 0, float("-inf"), float("inf"), 10)[0]
     # state = ABMove(state,0, float("-inf"), float("inf"), 10)[0]
     # print(state)
 
-    playGame(gameT.root)
-    #gameT.root.states = gameT.root.expandStates()
+    # gameT.root.states = gameT.root.expandStates()
 
-    #
-    # print("_____")
-    # for state in gameT.allStates:
+    # for state in gameT.root.states:
     #     print(state)
     #     print(state.score)
+    
+    
+    #
+    # print("_____")
     #
     #     if(state.checkLose()):
     #
