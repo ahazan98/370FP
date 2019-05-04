@@ -21,55 +21,69 @@ def expandTree(tree):
 
 # Algorithm that takes in a state and will perform minimax with Alpha-beta pruning on it,
 # returning the ideal next state and the evaluated score of the state
-def ABMove(state, depth, alpha, beta, depthLimit): 
-    
-    if(depth == depthLimit or state.checkWin()):
+def ABMove(state, depth, alpha, beta, depthLimit):
+
+    if(depth == depthLimit):
         return (state, state.evaluateScore())
-        
+
     else:
         states = state.expandStates()
-        # for state in states:
-        #     if state.checkWin():
-        #         return(state, state.evaluateScore())
+
         if len(states) == 0:
-            x = 0       
+            return(state, state.evaluateScore())
+        bestState = state
         if(state.turn == 0):
             bestVal = float("-inf")
             for Nstate in states:
-                
-                value = ABMove(Nstate, depth+1, alpha, beta, depthLimit)[1]
-                bestVal = max(value, bestVal)
-                alpha = max(alpha, bestVal)
+                result = ABMove(Nstate, depth+1, alpha, beta, depthLimit)
+                if(result[1] > bestVal):
+                    bestVal = result[1]
+                    bestState = Nstate
+                if(bestVal > alpha):
+                    alpha = bestVal
                 if beta <= alpha:
                     break
-            return (Nstate, bestVal)
+            return (bestState, bestVal)
         else:
             bestVal = float("inf")
+
             for Nstate in states:
-                
-                value = ABMove(Nstate, depth+1, alpha, beta, depthLimit)[1]
-                bestVal = min(value, bestVal)
-                beta = min(beta, bestVal)
-                if beta >= alpha:
+                # print("Nstate")
+                # print(Nstate)
+                result = ABMove(Nstate, depth+1, alpha, beta, depthLimit)
+                # print("result:" + str(result[1]))
+                if(result[1] < bestVal):
+                    bestVal = result[1]
+                    bestState = Nstate
+                # print("bestVal: "+ str(bestVal))
+                if(bestVal < beta):
+                    beta = bestVal
+                # print("beta: "+str(beta))
+                if beta <= alpha:
+                    # print("here")
                     break
-            return (Nstate, bestVal)
+            # print(bestState)
+            # print(bestVal)
+            return (bestState, bestVal)
 
 
 def playGame(currentRoot):
 
     count = 0
+
     while(not currentRoot.checkWin()):
         if(currentRoot.turn == 0):
-            currentRoot = ABMove(currentRoot, 0,float("-inf"),float("inf"), 10)[0]
+            currentRoot = ABMove(currentRoot, 0,float("-inf"),float("inf"), 4)[0]
             print("MADE MOVE")
             print(currentRoot)
-        else:
-            currentRoot = ABMove(currentRoot, 0,float("-inf"),float("inf"), 1)[0]
-            print("MADE MOVE")
 
+        else:
+            currentRoot = ABMove(currentRoot, 0,float("-inf"),float("inf"), 6)[0]
+            print("MADE MOVE")
             print(currentRoot)
-            
-       
+
+
+
         count+= 1
 
         print(count)
@@ -84,19 +98,31 @@ def playGame(currentRoot):
 
 
 def main():
-    gameT = gameTree(2, 5)
+    gameT = gameTree(4, 5)
 
     # numStates = len(gameT.allStates)
     # copy = gameT.root.copyState()
-    # copy.players[0].hands = [0,1,1]
-    # copy.players[1].hands = [0,0,0]
-    # copy.turn = 1
+    # copy.players[0].hands = [0,2,1,4]
+    # copy.players[1].hands = [1,1,3,2]
+    # copy.turn = 0
+    # print("OG")
     # print(copy)
-    # print(copy.checkWin())
+    # print(copy.evaluateScore())
+    # copy.makeTurn(0,0, True)
+    # print(copy)
+    # print("states")
+    # states = copy.expandStates()
+    # # for state in states:
+    # #     print(state)
+    # #     print(state.evaluateScore())
+    # state = ABMove(copy, 0,float("-inf"),float("inf"), 3)[0]
+    # print("Choice")
+    # print(state)
+
     # s = copy.expandStates()
     # print(len(s))
-    # for d in s: 
-    #     print(s)  
+    # for d in s:
+    #     print(s)
     # print(copy.turn)
 
     ##### PLAY AB GAME #####
@@ -122,11 +148,11 @@ def main():
     # copy.makeTurn(0,0,False)
     # print(copy)
 
-    
-    
+
+
     # print(gameT.root)
 
-    
+
     # gameT.allStates.add(gameT.root)
     # state = ABMove(gameT.root, 0, float("-inf"), float("inf"), 10)[0]
     # state = ABMove(state,0, float("-inf"), float("inf"), 10)[0]
@@ -137,8 +163,8 @@ def main():
     # for state in gameT.root.states:
     #     print(state)
     #     print(state.score)
-    
-    
+
+
     #
     # print("_____")
     #

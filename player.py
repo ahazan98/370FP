@@ -1,6 +1,7 @@
 #player has their hand values
 class player:
     def __init__(self, numHands, numFingers):
+        self.splitTimer = 0
         self.hands = []
         self.numHands = numHands
         self.numFingers = numFingers
@@ -15,7 +16,7 @@ class player:
 
             return
 
-        # newVal = (self.hands[hand] + number) 
+        # newVal = (self.hands[hand] + number)
         newVal = (self.hands[hand] + number) % self.numFingers #maybe include spillover?
         if(newVal >= self.numFingers):
             newVal = 0
