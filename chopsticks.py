@@ -25,7 +25,6 @@ def ABMove(state, depth, alpha, beta, depthLimit):
 
     if(depth == depthLimit):
         return (state, state.evaluateScore())
-
     else:
         states = state.expandStates()
 
