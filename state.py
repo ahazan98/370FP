@@ -1,11 +1,20 @@
+
+import math
+import time
+import random
 from player import player
 #State has two players
 class state:
-    def __init__(self, player1, player2, turn):
+    def __init__(self, player1, player2, turn, p=None): #need to add parent node to all states (ugh)
         self.players = [player1, player2]
         self.turn = turn
-        # self.states = []
+        self.states = []
         self.score = 0
+        self.visits = 0
+        self.selected = 0
+        self.wins = 0
+        self.parent = p
+        self.utc = 0
 
     def __str__(self):
         return ("Player 1's state: " + str(self.players[0].hands) +
@@ -13,6 +22,8 @@ class state:
             "\nPlayer " + str(self.turn +1) + "'s turn")
 
     def __eq__(self, other):
+        if other == None:
+            return False
         p1s1Hands = {}
         p2s1Hands = {}
         p1s2Hands = {}
@@ -51,10 +62,13 @@ class state:
         newPlayer1.hands = self.players[0].hands[:]
         newPlayer2.hands = self.players[1].hands[:]
 
-
-        return state(newPlayer1, newPlayer2, self.turn)
-
-
+        newState = state(newPlayer1, newPlayer2, self.turn,self.parent) 
+        newState.visits = self.visits
+        #does selected need to get changed?
+        newState.utc = newState.calcUtc() #do you need to do this? idk
+        return newState
+    
+        
     '''
     score a state we need to revisit this...... I don't think we need the turn parameter
     '''
@@ -93,7 +107,7 @@ class state:
         return score
 
     '''
-    check if a player has lost the game
+    check if a player has won the game
     '''
     def checkWin(self):
         p1sum = sum(self.players[0].hands)
@@ -141,6 +155,8 @@ class state:
                         copy.score = copy.evaluateScore()
                         
                         if copy != self:
+                            copy.parent = self
+                            copy.utc = copy.calcUtc()
                             possibleStates.add(copy)
         copy = self.copyState()
         if(not copy.allSame()):
@@ -152,6 +168,8 @@ class state:
             
             copy.evaluateScore() #changed from 1 to 0.... is this change for the next state?
             if copy != self:
+                copy.parent = self
+                copy.utc = copy.calcUtc()
                 possibleStates.add(copy)
             
         possibleStates.remove(self)
@@ -204,3 +222,27 @@ class state:
             self.turn = 1
         else:
             self.turn = 0
+
+    '''
+    Evaluates the utc score of a given state
+    '''
+    def calcUtc(self):
+        coeff = .6
+        value = 0
+        value_2 = 0
+        #if a state doesn't have a parent, also uses it in ABmove
+        if self.parent == None:
+            return 0
+        else:
+            
+            if self.visits == 0:
+                value = 0
+                value_2 = 0
+            if self.parent.visits == 0:
+                value_2 = 0
+            else:
+                value = self.wins /self.visits
+                
+                value_2 = math.sqrt(math.log10(self.parent.visits)/self.visits)
+            score = value + coeff * value_2
+            return score

@@ -54,7 +54,94 @@ def ABMove(state, depth, alpha, beta, depthLimit):
                     break
             return (Nstate, bestVal)
 
+'''
+Determine the best next move while implementing monte carlo tree search
+'''
+def mctsMove(root):
+    start_time = time.time()
+    # root.states = [] #do we need to delete the states from the last player's turn?
+    while resources_left(start_time):
+        leaf = traverse(root)
+        simulation_result = rollout(leaf)
+        backpropogate(leaf,simulation_result)
+    return best_child(root) #child with highest number of visits
 
+def resources_left(start_time):
+    current_time = time.time()
+    # print(current_time)
+    if current_time > start_time + 1: #idk how long to use
+        return False
+    return True
+
+def best_child(root):
+    bc = root.states[0]
+    for state in root.states[1:]:
+        if state.visits > bc.visits:
+            bc = state
+    return bc
+
+def traverse(state):
+    while isBoundary(state) == False: #need better criteria for deciding if 
+        selected_states = []
+        for index in range(len(state.states)): #select all children that have been expanded upon
+            if state.states[index].selected == 1: 
+                selected_states.append(index)
+        best_state = state.states[0]
+        for index in selected_states: #pick the bet utc of the selected states
+            #pick maximum state
+            if state.states[index].utc > best_state.utc:
+                best_state = state.states[index]
+        state = best_state
+
+    if state.checkWin(): #return that state if it is a win
+        return state
+    else: #expand its children and then pick a random one to expand upon
+        state.states = list(state.expandStates())
+        rand_child = random.randint(0,len(state.states)-1)
+        state.states[rand_child].selected = 1
+        return state.states[rand_child]
+
+def isBoundary(state):
+
+    if state.selected == 1: #if part of frontier
+        if state.states == []: #if its children have been not been explored, then we know its on an edge
+            return True
+        else: #it has children, but it is a boundary only if none of its children are selected
+            for state in state.states: 
+                if state.selected == 1: #then one of its states is part of the frontier and will be expanded
+                    return False
+            return True
+    else: #if it hasn't been selected, then something is messed up and should let us know
+        return -1
+
+def rollout(start):
+    curr = start
+    while not curr.checkWin(): 
+        if curr.states == []:
+            curr.states = list(curr.expandStates())
+        rand_child = random.randint(0,len(curr.states)-1)
+        curr = curr.states[rand_child]
+    
+    #at a end state, if the player opposite the turn has no fingers return a one, else return 0
+    turn = curr.turn
+    p1sum = sum(curr.players[0].hands)
+    p2sum = sum(curr.players[1].hands)
+    if turn == 0:
+        if p2sum == 0:
+            return 1
+        else:
+            return 0
+    else:
+        if p1sum == 0:
+            return 1
+        else: 
+            return 0    
+        
+def backpropogate(node, result):
+    if node.parent == None:
+        return
+    node.wins += result
+    node.visits += 1
 def playGame(currentRoot):
 
     count = 0
@@ -64,7 +151,8 @@ def playGame(currentRoot):
             print("MADE MOVE")
             print(currentRoot)
         else:
-            currentRoot = ABMove(currentRoot, 0,float("-inf"),float("inf"), 1)[0]
+            # currentRoot = ABMove(currentRoot, 0,float("-inf"),float("inf"), 1)[0]
+            currentRoot = mctsMove(currentRoot)
             print("MADE MOVE")
 
             print(currentRoot)
