@@ -4,7 +4,7 @@ class state:
     def __init__(self, player1, player2, turn):
         self.players = [player1, player2]
         self.turn = turn
-        # self.states = []
+        self.states = []
 
         self.score = 0
 
@@ -192,17 +192,17 @@ class state:
     def makeTurn(self, handM, handR, split):
         if split:
 
-            liveHand = 0
-
-            liveHand = liveHands(self.players[self.turn].hands)
+            # liveHand = 0
+            #
+            # liveHand = liveHands(self.players[self.turn].hands)
 
             total = sum(self.players[self.turn].hands)
-
+            
             # value = int (total / liveHand)
             value = int(total/ self.players[self.turn].numHands)
             # leftover = total % liveHand
             leftover = total % self.players[self.turn].numHands
-            self.players[self.turn].splitTimer = self.players[self.turn].numHands+1
+            self.players[self.turn].splitTimer = self.players[self.turn].numHands*2
             for i in range(len(self.players[self.turn].hands)):
                 # if self.players[self.turn].hands[i] != 0:
                 #     self.players[self.turn].hands[i] = value

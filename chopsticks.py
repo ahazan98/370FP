@@ -55,7 +55,7 @@ def ABMove(state, depth, alpha, beta, depthLimit):
                 if(result[1] < bestVal):
                     bestVal = result[1]
                     bestState = Nstate
-                # print("bestVal: "+ str(bestVal))
+
                 if(bestVal < beta):
                     beta = bestVal
                 # print("beta: "+str(beta))
@@ -73,7 +73,7 @@ def playGame(currentRoot):
 
     while(not currentRoot.checkWin()):
         if(currentRoot.turn == 0):
-            currentRoot = ABMove(currentRoot, 0,float("-inf"),float("inf"), 4)[0]
+            currentRoot = ABMove(currentRoot, 0,float("-inf"),float("inf"), 5)[0]
             print("MADE MOVE")
             print(currentRoot)
 
