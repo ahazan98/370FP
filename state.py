@@ -240,6 +240,8 @@ class state:
                 value_2 = 0
             if self.parent.visits == 0:
                 value_2 = 0
+            if self.wins == 0:
+                value = 0
             else:
                 value = self.wins /self.visits
                 

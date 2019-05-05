@@ -69,7 +69,7 @@ def mctsMove(root):
 def resources_left(start_time):
     current_time = time.time()
     # print(current_time)
-    if current_time > start_time + .25: #idk how long to use
+    if current_time > start_time + 1: #idk how long to use
         return False
     return True
 
