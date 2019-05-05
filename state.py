@@ -63,7 +63,7 @@ class state:
         newPlayer2.hands = self.players[1].hands[:]
 
         newState = state(newPlayer1, newPlayer2, self.turn,self.parent) 
-        newState.visits = self.visits
+        newState.visits = 0 #self.visits #0
         #does selected need to get changed?
         newState.utc = newState.calcUtc() #do you need to do this? idk
         return newState

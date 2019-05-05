@@ -69,7 +69,7 @@ def mctsMove(root):
 def resources_left(start_time):
     current_time = time.time()
     # print(current_time)
-    if current_time > start_time + 1: #idk how long to use
+    if current_time > start_time + .25: #idk how long to use
         return False
     return True
 
@@ -147,7 +147,7 @@ def playGame(currentRoot):
     count = 0
     while(not currentRoot.checkWin()):
         if(currentRoot.turn == 0):
-            currentRoot = ABMove(currentRoot, 0,float("-inf"),float("inf"), 10)[0]
+            currentRoot = ABMove(currentRoot, 0,float("-inf"),float("inf"), 12)[0]
             print("MADE MOVE")
             print(currentRoot)
         else:
