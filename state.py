@@ -63,7 +63,7 @@ class state:
         newPlayer2.hands = self.players[1].hands[:]
 
         newState = state(newPlayer1, newPlayer2, self.turn,self.parent) 
-        newState.visits = 0 #self.visits #0
+        newState.visits = self.visits #0
         #does selected need to get changed?
         newState.utc = newState.calcUtc() #do you need to do this? idk
         return newState
@@ -75,13 +75,20 @@ class state:
     def evaluateScore(self):
         score = 0
         if(self.checkWin()):
+            p1sum = sum(self.players[0].hands)
+            p2sum = sum(self.players[1].hands)
 
             if(self.turn == 0):
-                score = self.players[0].numHands * -10000
+                if p1sum == 0:
+                    score = self.players[0].numHands * -10000
+                else:
+                    score = self.players[0].numHands * 10000
 
             else:
-
-                score = self.players[1].numHands * 10000
+                if p2sum == 0:
+                     score = self.players[1].numHands * -10000
+                else:
+                    score = self.players[1].numHands * 10000
 
         numDead = 0
         for i in self.players[0].hands:
