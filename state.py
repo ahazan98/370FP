@@ -224,7 +224,7 @@ class state:
             value = int(total/ self.players[self.turn].numHands)
             # leftover = total % liveHand
             leftover = total % self.players[self.turn].numHands
-            self.players[self.turn].splitTimer = self.players[self.turn].numHands*2
+        
             for i in range(len(self.players[self.turn].hands)):
                 # if self.players[self.turn].hands[i] != 0:
                 #     self.players[self.turn].hands[i] = value

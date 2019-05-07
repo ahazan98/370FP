@@ -53,7 +53,7 @@ def ABMove(state, depth, alpha, beta, depthLimit, allStates):
                     alpha = bestVal
                 # if beta <= alpha:
                 #     break
-                # else:
+                # # else:
                 # allStates.add(Nstate)
 
             return (bestState, bestVal, allStates)
@@ -219,7 +219,7 @@ def playGame(currentRoot):
 
 
 def main():
-    gameT = gameTree(5, 5)
+    gameT = gameTree(2, 5)
 
 
     # (currentRoot,score,allStates) = ABMove(gameT.root, 0,float("-inf"),float("inf"), 10, {gameT.root})
