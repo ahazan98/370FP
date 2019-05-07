@@ -34,7 +34,8 @@ def ABMove(state, depth, alpha, beta, depthLimit, allStates):
 
             if(state in allStates):
                 states.remove(state)
-
+            else:
+                allStates.add(state)
 
 
         if len(states) == 0:
@@ -53,7 +54,7 @@ def ABMove(state, depth, alpha, beta, depthLimit, allStates):
                 # if beta <= alpha:
                 #     break
                 # else:
-                allStates.add(Nstate)
+                # allStates.add(Nstate)
 
             return (bestState, bestVal, allStates)
         else:
@@ -75,7 +76,7 @@ def ABMove(state, depth, alpha, beta, depthLimit, allStates):
                 #     # print("here")
                 #     break
                 # else:
-                allStates.add(Nstate)
+                # allStates.add(Nstate)
 
             # print(bestState)
             # print(bestVal)
@@ -182,7 +183,7 @@ def playGame(currentRoot):
             (currentRoot,score,allStates) = ABMove(currentRoot, 0,float("-inf"),float("inf"), 10, p1Visit)
             print("MADE MOVE")
             print(currentRoot)
-            # p1Visit.update(allStates)
+            p1Visit.update(allStates)
             print(len(allStates))
             totalStates += len(allStates)
             print("_____")
@@ -193,7 +194,7 @@ def playGame(currentRoot):
             # currentRoot = mctsMove(currentRoot)
             print("MADE MOVE")
             print(currentRoot)
-            # p2Visit.update(allStates)
+            p2Visit.update(allStates)
             print(len(allStates))
             print("______")
 
@@ -218,7 +219,7 @@ def playGame(currentRoot):
 
 
 def main():
-    gameT = gameTree(4, 5)
+    gameT = gameTree(5, 5)
 
 
     # (currentRoot,score,allStates) = ABMove(gameT.root, 0,float("-inf"),float("inf"), 10, {gameT.root})
