@@ -168,7 +168,8 @@ class state:
                             copy.utc = copy.calcUtc()
                             possibleStates.add(copy)
         copy = self.copyState()
-        if(not copy.allSame() and self.players[self.turn].splitTimer < 1): #maybe need to change so doesn't affect MCTS
+         # and self.players[self.turn].splitTimer < 1
+        if(not copy.allSame()): #maybe need to change so doesn't affect MCTS
             # print("turn before split " + str(copy.turn))
 
             copy.makeTurn(0,0, True)
@@ -180,7 +181,7 @@ class state:
                 copy.parent = self
                 copy.utc = copy.calcUtc()
                 possibleStates.add(copy)
-        
+
         possibleStates.remove(self)
 
         return possibleStates
