@@ -21,20 +21,31 @@ def expandTree(tree):
 
 # Algorithm that takes in a state and will perform minimax with Alpha-beta pruning on it,
 # returning the ideal next state and the evaluated score of the state
-def ABMove(state, depth, alpha, beta, depthLimit):
+def ABMove(state, depth, alpha, beta, depthLimit, allStates):
 
     if(depth == depthLimit):
-        return (state, state.evaluateScore())
+        return (state, state.evaluateScore(), allStates)
     else:
         states = state.expandStates()
+        states = list(states)
+        temp = states[:]
 
+        for state in temp:
+
+            if(state not in allStates):
+                allStates.add(state)
+            else:
+                states.remove(state)
+
+
+        allStates.update(states)
         if len(states) == 0:
-            return(state, state.evaluateScore())
+            return(state, state.evaluateScore(), allStates)
         bestState = state
         if(state.turn == 0):
             bestVal = float("-inf")
             for Nstate in states:
-                result = ABMove(Nstate, depth+1, alpha, beta, depthLimit)
+                result = ABMove(Nstate, depth+1, alpha, beta, depthLimit, allStates)
                 if(result[1] > bestVal):
                     bestVal = result[1]
                     bestState = Nstate
@@ -42,14 +53,14 @@ def ABMove(state, depth, alpha, beta, depthLimit):
                     alpha = bestVal
                 if beta <= alpha:
                     break
-            return (bestState, bestVal)
+            return (bestState, bestVal, allStates)
         else:
             bestVal = float("inf")
 
             for Nstate in states:
                 # print("Nstate")
                 # print(Nstate)
-                result = ABMove(Nstate, depth+1, alpha, beta, depthLimit)
+                result = ABMove(Nstate, depth+1, alpha, beta, depthLimit, allStates)
                 # print("result:" + str(result[1]))
                 if(result[1] < bestVal):
                     bestVal = result[1]
@@ -63,7 +74,7 @@ def ABMove(state, depth, alpha, beta, depthLimit):
                     break
             # print(bestState)
             # print(bestVal)
-            return (bestState, bestVal)
+            return (bestState, bestVal, allStates)
 
 '''
 Determine the best next move while implementing monte carlo tree search
@@ -92,10 +103,10 @@ def best_child(root):
     return bc
 
 def traverse(state):
-    while isBoundary(state) == False: #need better criteria for deciding if 
+    while isBoundary(state) == False: #need better criteria for deciding if
         selected_states = []
         for index in range(len(state.states)): #select all children that have been expanded upon
-            if state.states[index].selected == 1: 
+            if state.states[index].selected == 1:
                 selected_states.append(index)
         best_state = state.states[0]
         for index in selected_states: #pick the bet utc of the selected states
@@ -118,7 +129,7 @@ def isBoundary(state):
         if state.states == []: #if its children have been not been explored, then we know its on an edge
             return True
         else: #it has children, but it is a boundary only if none of its children are selected
-            for state in state.states: 
+            for state in state.states:
                 if state.selected == 1: #then one of its states is part of the frontier and will be expanded
                     return False
             return True
@@ -127,12 +138,12 @@ def isBoundary(state):
 
 def rollout(start):
     curr = start
-    while not curr.checkWin(): 
+    while not curr.checkWin():
         if curr.states == []:
             curr.states = list(curr.expandStates())
         rand_child = random.randint(0,len(curr.states)-1)
         curr = curr.states[rand_child]
-    
+
     #at a end state, if the player opposite the turn has no fingers return a one, else return 0
     turn = curr.turn
     p1sum = sum(curr.players[0].hands)
@@ -145,9 +156,9 @@ def rollout(start):
     else:
         if p1sum == 0:
             return 1
-        else: 
-            return 0    
-        
+        else:
+            return 0
+
 def backpropogate(node, result):
     if node.parent == None:
         return
@@ -156,19 +167,27 @@ def backpropogate(node, result):
 def playGame(currentRoot):
 
     count = 0
-
+    p1Visit = set()
+    p2Visit = set()
+    # not currentRoot.checkWin()
     while(not currentRoot.checkWin()):
         if(currentRoot.turn == 0):
-            currentRoot = ABMove(currentRoot, 0,float("-inf"),float("inf"), 5)[0]
+            p1Visit.add(currentRoot)
+            (currentRoot,score,allStates) = ABMove(currentRoot, 0,float("-inf"),float("inf"), 10, p1Visit)
             print("MADE MOVE")
             print(currentRoot)
+            p1Visit.update(allStates)
+            print(len(allStates))
+            print("_____")
 
         else:
 
-            # currentRoot = ABMove(currentRoot, 0,float("-inf"),float("inf"), 1)[0]
-            currentRoot = mctsMove(currentRoot)
+            (currentRoot,score,allStates) = ABMove(currentRoot, 0,float("-inf"),float("inf"), 5, {currentRoot})
+            # currentRoot = mctsMove(currentRoot)
             print("MADE MOVE")
             print(currentRoot)
+            print(len(allStates))
+            print("______")
 
 
 
@@ -179,15 +198,28 @@ def playGame(currentRoot):
     if(currentRoot.turn == 0):
         print(currentRoot)
         print("Player 2 has won")
+        print(len(allStates))
     else:
         print(currentRoot)
         print("Player 1 has won")
+        print(len(allStates))
 
 
 
 def main():
     gameT = gameTree(4, 5)
 
+
+    # (currentRoot,score,allStates) = ABMove(gameT.root, 0,float("-inf"),float("inf"), 25, {gameT.root})
+    # print(len(allStates))
+    # print("__")
+    # (currentRoot,score,allStates) = ABMove(currentRoot, 0,float("-inf"),float("inf"), 1, allStates)
+    # print("__")
+    # (currentRoot,score,allStates) = ABMove(currentRoot, 0,float("-inf"),float("inf"), 1, allStates)
+    # print("__")
+
+
+    # print(len(allStates))
     # numStates = len(gameT.allStates)
     # copy = gameT.root.copyState()
     # copy.players[0].hands = [0,2,1,4]

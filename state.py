@@ -16,7 +16,7 @@ class state:
         self.wins = 0
         self.parent = p
         self.utc = 0
-
+        self.visited = set()
     def __str__(self):
         return ("Player 1's state: " + str(self.players[0].hands) +
             "\nPlayer 2's state: " + str(self.players[1].hands) +
@@ -66,13 +66,13 @@ class state:
         newPlayer1.splitTimer = self.players[0].splitTimer
         newPlayer2.splitTimer = self.players[1].splitTimer
 
-        newState = state(newPlayer1, newPlayer2, self.turn,self.parent) 
+        newState = state(newPlayer1, newPlayer2, self.turn,self.parent)
         newState.visits = 0 #self.visits #0
         #does selected need to get changed?
         newState.utc = newState.calcUtc() #do you need to do this? idk
         return newState
-    
-        
+
+
     '''
     score a state we need to revisit this...... I don't think we need the turn parameter
     '''
@@ -180,8 +180,9 @@ class state:
                 copy.parent = self
                 copy.utc = copy.calcUtc()
                 possibleStates.add(copy)
-
+        
         possibleStates.remove(self)
+
         return possibleStates
 
     '''
@@ -217,7 +218,7 @@ class state:
             # liveHand = liveHands(self.players[self.turn].hands)
 
             total = sum(self.players[self.turn].hands)
-            
+
             # value = int (total / liveHand)
             value = int(total/ self.players[self.turn].numHands)
             # leftover = total % liveHand
@@ -268,7 +269,7 @@ class state:
         if self.parent == None:
             return 0
         else:
-            
+
             if self.visits == 0:
                 value = 0
                 value_2 = 0
@@ -276,7 +277,60 @@ class state:
                 value_2 = 0
             else:
                 value = self.wins /self.visits
-                
+
                 value_2 = math.sqrt(math.log10(self.parent.visits)/self.visits)
             score = value + coeff * value_2
             return score
+
+
+    #
+    # def expandStates(self):
+    #     possibleStates = set()
+    #     playerMoves = set()
+    #     # print("here")
+    #     possibleStates.add(self)
+    #
+    #     for i in range(len(self.players[self.turn].hands)):
+    #         # if(0 < self.players[self.turn].hands[i]):
+    #             for j in range(len(self.players[self.turn].hands)):
+    #                 # if((self.players[self.turn].hands[i] not in playerMoves)):
+    #                 oHand = self.players[self.turn].hands[i]
+    #                 dHand = self.players[(self.turn + 1) % 2].hands[j]
+    #                 tuple = (oHand, dHand)
+    #                 if tuple not in playerMoves and oHand != 0 and dHand != 0:
+    #                     playerMoves.add(tuple)
+    #                     # playerMoves.add(self.players[self.turn].hands[i])
+    #                     copy = self.copyState()
+    #
+    #                     # print("turn before move " + str(copy.turn))
+    #                     copy.makeTurn(i, j, False)
+    #                     # print("turn after move "  + str(copy.turn))
+    #
+    #                     if(self.players[self.turn].splitTimer > 0):
+    #                         copy.players[self.turn].splitTimer -= 1
+    #                     copy.score = copy.evaluateScore()
+    #
+    #                     if copy != self and copy not in self.visited:
+    #                         # print(copy)
+    #                         # print(copy.evaluateScore())
+    #                         copy.parent = self
+    #                         copy.utc = copy.calcUtc()
+    #                         possibleStates.add(copy)
+    #     copy = self.copyState()
+    #     if(not copy.allSame() and self.players[self.turn].splitTimer < 1): #maybe need to change so doesn't affect MCTS
+    #         # print("turn before split " + str(copy.turn))
+    #
+    #         copy.makeTurn(0,0, True)
+    #         # print("turn after split"  + str(copy.turn))
+    #
+    #
+    #         copy.evaluateScore() #changed from 1 to 0.... is this change for the next state?
+    #         if copy != self:
+    #             copy.parent = self
+    #             copy.utc = copy.calcUtc()
+    #             possibleStates.add(copy)
+    #     for state in possibleStates:
+    #         state.visited.update(possibleStates)
+    #         state.visited.update(self.visited)
+    #     possibleStates.remove(self)
+    #     return possibleStates
