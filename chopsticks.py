@@ -177,6 +177,8 @@ def playGame(currentRoot):
     p1Visit = set()
     p2Visit = set()
     totalStates = 0
+    currentRoot = randomMoves(currentRoot)
+    
     # not currentRoot.checkWin()
     while(not currentRoot.checkWin()):
         if(currentRoot.turn == 0):
@@ -219,6 +221,15 @@ def playGame(currentRoot):
         print(len(allStates))
         print(totalStates / float(count))
 
+def randomMoves(currentRoot):
+    for i in range(5):
+        states = currentRoot.expandStates()
+        currentRoot = random.choice(tuple(states))
+        if(len(currentRoot.expandStates()) == 0):
+            currentRoot = random.choice(tuple(states))
+
+
+    return currentRoot
 
 
 def main():
