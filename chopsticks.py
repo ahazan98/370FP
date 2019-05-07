@@ -44,14 +44,16 @@ def ABMove(state, depth, alpha, beta, depthLimit, allStates):
             bestVal = float("-inf")
             for Nstate in states:
                 result = ABMove(Nstate, depth+1, alpha, beta, depthLimit, allStates)
-                allStates.add(Nstate)
+
                 if(result[1] > bestVal):
                     bestVal = result[1]
                     bestState = Nstate
                 if(bestVal > alpha):
                     alpha = bestVal
-                if beta <= alpha:
-                    break
+                # if beta <= alpha:
+                #     break
+                # else:
+                allStates.add(Nstate)
 
             return (bestState, bestVal, allStates)
         else:
@@ -61,7 +63,7 @@ def ABMove(state, depth, alpha, beta, depthLimit, allStates):
                 # print("Nstate")
                 # print(Nstate)
                 result = ABMove(Nstate, depth+1, alpha, beta, depthLimit, allStates)
-                allStates.add(Nstate)
+
                 if(result[1] < bestVal):
                     bestVal = result[1]
                     bestState = Nstate
@@ -69,9 +71,11 @@ def ABMove(state, depth, alpha, beta, depthLimit, allStates):
                 if(bestVal < beta):
                     beta = bestVal
                 # print("beta: "+str(beta))
-                if beta <= alpha:
-                    # print("here")
-                    break
+                # if beta <= alpha:
+                #     # print("here")
+                #     break
+                # else:
+                allStates.add(Nstate)
 
             # print(bestState)
             # print(bestVal)
@@ -170,6 +174,7 @@ def playGame(currentRoot):
     count = 0
     p1Visit = set()
     p2Visit = set()
+    totalStates = 0
     # not currentRoot.checkWin()
     while(not currentRoot.checkWin()):
         if(currentRoot.turn == 0):
@@ -177,8 +182,9 @@ def playGame(currentRoot):
             (currentRoot,score,allStates) = ABMove(currentRoot, 0,float("-inf"),float("inf"), 10, p1Visit)
             print("MADE MOVE")
             print(currentRoot)
-            p1Visit.update(allStates)
+            # p1Visit.update(allStates)
             print(len(allStates))
+            totalStates += len(allStates)
             print("_____")
 
         else:
@@ -187,7 +193,7 @@ def playGame(currentRoot):
             # currentRoot = mctsMove(currentRoot)
             print("MADE MOVE")
             print(currentRoot)
-            p2Visit.update(allStates)
+            # p2Visit.update(allStates)
             print(len(allStates))
             print("______")
 
@@ -196,24 +202,28 @@ def playGame(currentRoot):
         count+= 1
 
         print(count)
+
         print()
     if(currentRoot.turn == 0):
         print(currentRoot)
         print("Player 2 has won")
         print(len(allStates))
+        print(totalStates / float(count))
     else:
         print(currentRoot)
         print("Player 1 has won")
         print(len(allStates))
+        print(totalStates / float(count))
 
 
 
 def main():
-    gameT = gameTree(2, 5)
+    gameT = gameTree(4, 5)
 
 
-    # (currentRoot,score,allStates) = ABMove(gameT.root, 0,float("-inf"),float("inf"), 25, {gameT.root})
+    # (currentRoot,score,allStates) = ABMove(gameT.root, 0,float("-inf"),float("inf"), 10, {gameT.root})
     # print(len(allStates))
+
     # print("__")
     # (currentRoot,score,allStates) = ABMove(currentRoot, 0,float("-inf"),float("inf"), 1, allStates)
     # print("__")
@@ -221,31 +231,7 @@ def main():
     # print("__")
 
 
-    # print(len(allStates))
-    # numStates = len(gameT.allStates)
-    # copy = gameT.root.copyState()
-    # copy.players[0].hands = [0,2,1,4]
-    # copy.players[1].hands = [1,1,3,2]
-    # copy.turn = 0
-    # print("OG")
-    # print(copy)
-    # print(copy.evaluateScore())
-    # copy.makeTurn(0,0, True)
-    # print(copy)
-    # print("states")
-    # states = copy.expandStates()
-    # # for state in states:
-    # #     print(state)
-    # #     print(state.evaluateScore())
-    # state = ABMove(copy, 0,float("-inf"),float("inf"), 3)[0]
-    # print("Choice")
-    # print(state)
 
-    # s = copy.expandStates()
-    # print(len(s))
-    # for d in s:
-    #     print(s)
-    # print(copy.turn)
 
     ##### PLAY AB GAME #####
     playGame(gameT.root)
