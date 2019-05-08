@@ -265,7 +265,7 @@ class state:
     Evaluates the utc score of a given state
     '''
     def calcUtc(self):
-        coeff = .6
+        coeff = .5
         value = 0
         value_2 = 0
         #if a state doesn't have a parent, also uses it in ABmove

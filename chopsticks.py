@@ -87,7 +87,7 @@ Determine the best next move while implementing monte carlo tree search
 '''
 def mctsMove(root):
     start_time = time.time()
-    # root.states = [] #do we need to delete the states from the last player's turn?
+    root.states = [] #do we need to delete the states from the last player's turn?
     while resources_left(start_time):
         leaf = traverse(root)
         simulation_result = rollout(leaf)
@@ -97,7 +97,7 @@ def mctsMove(root):
 def resources_left(start_time):
     current_time = time.time()
     # print(current_time)
-    if current_time > start_time + 3: #idk how long to use
+    if current_time > start_time + .5: #idk how long to use
         return False
     return True
 
@@ -183,43 +183,45 @@ def playGame(currentRoot):
     while(not currentRoot.checkWin()):
         if(currentRoot.turn == 0):
             p1Visit.add(currentRoot)
-            (currentRoot,score,allStates) = ABMove(currentRoot, 0,float("-inf"),float("inf"), 10, p1Visit)
+            (currentRoot,score,allStates) = ABMove(currentRoot, 0,float("-inf"),float("inf"), 7, p1Visit)
 
-            print("MADE MOVE")
-            print(currentRoot)
+            # print("MADE MOVE")
+            # print(currentRoot)
             p1Visit.update(allStates)
-            print(len(allStates))
+            # print(len(allStates))
             totalStates += len(allStates)
-            print("_____")
+            # print("_____")
 
         else:
             p2Visit.add(currentRoot)
-            (currentRoot,score,allStates) = ABMove(currentRoot, 0,float("-inf"),float("inf"), 1, p2Visit)
+            # (currentRoot,score,allStates) = ABMove(currentRoot, 0,float("-inf"),float("inf"), 1, p2Visit)
 
-            # currentRoot = mctsMove(currentRoot)
-            print("MADE MOVE")
-            print(currentRoot)
-            p2Visit.update(allStates)
-            print(len(allStates))
-            print("______")
+            currentRoot = mctsMove(currentRoot)
+            # print("MADE MOVE")
+            # print(currentRoot)
+            # p2Visit.update(allStates)
+            # print(len(allStates))
+            # print("______")
 
 
 
         count+= 1
 
-        print(count)
+        # print(count)
 
-        print()
+        # print()
     if(currentRoot.turn == 0):
-        print(currentRoot)
+        # print(currentRoot)
         print("Player 2 has won")
-        print(len(allStates))
-        print(totalStates / float(count))
+        # print(len(allStates))
+        # print(totalStates / float(count))
+        return 1
     else:
-        print(currentRoot)
+        # print(currentRoot)
         print("Player 1 has won")
-        print(len(allStates))
-        print(totalStates / float(count))
+        # print(len(allStates))
+        # print(totalStates / float(count))
+        return 0
 
 def randomMoves(currentRoot):
     for i in range(5):
@@ -233,7 +235,7 @@ def randomMoves(currentRoot):
 
 
 def main():
-    gameT = gameTree(5, 5)
+    
 
 
     # (currentRoot,score,allStates) = ABMove(gameT.root, 0,float("-inf"),float("inf"), 10, {gameT.root})
@@ -249,7 +251,14 @@ def main():
 
 
     ##### PLAY AB GAME #####
-    playGame(gameT.root)
+    wins = 0
+    for i in range(30):
+        gameT = gameTree(5, 5)
+        print(i)
+        wins += playGame(gameT.root)
+
+    pct = wins/float(30)
+    print(pct)
 
     ##### TEST EXPANDSTATES() #####
     # states = copy.expandStates()
