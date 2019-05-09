@@ -86,19 +86,22 @@ def ABMove(state, depth, alpha, beta, depthLimit, allStates):
 '''
 Determine the best next move while implementing monte carlo tree search
 '''
-def mctsMove(root):
+def mctsMove(root, maxStates):
+    count = 0
     start_time = time.time()
     root.states = [] #do we need to delete the states from the last player's turn?
-    while resources_left(start_time):
+    while resources_left(start_time, count, maxStates):
         leaf = traverse(root)
         simulation_result = rollout(leaf)
+        count+= 1
         backpropogate(leaf,simulation_result)
+    
     return best_child(root) #child with highest number of visits
 
-def resources_left(start_time):
+def resources_left(start_time, count, maxStates):
     current_time = time.time()
     # print(current_time)
-    if current_time > start_time + .5: #idk how long to use
+    if current_time > start_time + 2 or count > maxStates: #idk how long to use
         return False
     return True
 
@@ -179,25 +182,26 @@ def playGame(currentRoot):
     p1Visit = set()
     p2Visit = set()
     totalStates = 0
-
+    maxStates = float("inf")
 
 
     while(not currentRoot.checkWin()):
         if(currentRoot.turn == 0):
+
             p1Visit.add(currentRoot)
-            (currentRoot,score,allStates) = ABMove(currentRoot, 1,float("-inf"),float("inf"), 2, p1Visit)
+            (currentRoot,score,allStates) = ABMove(currentRoot, 1,float("-inf"),float("inf"), 6, p1Visit)
             print("MADE MOVE")
             print(currentRoot)
             p1Visit.update(allStates)
-            # print(len(allStates))
+            maxStates = len(allStates)
             totalStates += len(allStates)
             # print("_____")
 
         else:
             p2Visit.add(currentRoot)
-            (currentRoot,score,allStates) = ABMove(currentRoot, 1,float("-inf"),float("inf"), 6, p2Visit)
+            # (currentRoot,score,allStates) = ABMove(currentRoot, 1,float("-inf"),float("inf"), 6, p2Visit)
 
-            currentRoot = mctsMove(currentRoot)
+            currentRoot = mctsMove(currentRoot, maxStates)
             print("MADE MOVE")
             print(currentRoot)
             p2Visit.update(allStates)
@@ -245,7 +249,7 @@ def randomMoves(currentRoot):
     return currentRoot
 
 def main():
-
+    gameT = gameTree(5,5)
 
     # currentRoot = randomMoves(gameT.root)
     # (currentRoot,score,allStates) = ABMove(gameT.root, 0,float("-inf"),float("inf"), 10, {gameT.root})
