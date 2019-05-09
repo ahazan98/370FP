@@ -179,12 +179,12 @@ def playGame(currentRoot):
     totalStates = 0
     currentRoot = randomMoves(currentRoot)
     print(currentRoot)
-    currentRoot.turn = 0
+
 
     while(not currentRoot.checkWin()):
         if(currentRoot.turn == 0):
             p1Visit.add(currentRoot)
-            (currentRoot,score,allStates) = ABMove(currentRoot, 0,float("-inf"),float("inf"), 5, p1Visit)
+            (currentRoot,score,allStates) = ABMove(currentRoot, 0,float("-inf"),float("inf"), 7, p1Visit)
             print("MADE MOVE")
             print(currentRoot)
             p1Visit.update(allStates)
@@ -194,7 +194,7 @@ def playGame(currentRoot):
 
         else:
             p2Visit.add(currentRoot)
-            (currentRoot,score,allStates) = ABMove(currentRoot, 0,float("-inf"),float("inf"), 7, p2Visit)
+            (currentRoot,score,allStates) = ABMove(currentRoot, 0,float("-inf"),float("inf"), 1, p2Visit)
             # currentRoot = mctsMove(currentRoot)
             print("MADE MOVE")
             print(currentRoot)
@@ -224,7 +224,7 @@ def playGame(currentRoot):
         return 1
 
 def randomMoves(currentRoot):
-    for i in range(5):
+    for i in range(4):
         states = currentRoot.expandStates()
         currentRoot = random.choice(tuple(states))
         if(len(currentRoot.expandStates()) == 0):
@@ -251,6 +251,7 @@ def main():
 
 
     ##### PLAY AB GAME #####
+    playGame(gameT.root)
     winners = {"p1" : 0, "p2":0}
     loops = 0
     for i in range(30):
