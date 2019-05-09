@@ -164,7 +164,7 @@ class state:
                         copy.makeTurn(i, j, False)
                         # print("turn after move "  + str(copy.turn))
 
-                        
+
                         copy.score = copy.evaluateScore()
 
                         if copy != self:
@@ -227,6 +227,7 @@ class state:
             value = int(total/ self.players[self.turn].numHands)
             # leftover = total % liveHand
             leftover = total % self.players[self.turn].numHands
+
             for i in range(len(self.players[self.turn].hands)):
                 # if self.players[self.turn].hands[i] != 0:
                 #     self.players[self.turn].hands[i] = value
@@ -286,6 +287,3 @@ class state:
                 value_2 = math.sqrt(math.log10(self.parent.visits)/self.visits)
             score = value + coeff * value_2
             return score
-
-
- 
