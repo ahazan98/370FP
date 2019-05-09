@@ -115,9 +115,9 @@ def traverse(state):
             if state.states[index].selected == 1:
                 selected_states.append(index)
         best_state = state.states[0]
-        for index in selected_states: #pick the bet utc of the selected states
+        for index in selected_states: #pick the bet uct of the selected states
             #pick maximum state
-            if state.states[index].utc > best_state.utc:
+            if state.states[index].uct > best_state.uct:
                 best_state = state.states[index]
         state = best_state
 
@@ -170,6 +170,7 @@ def backpropogate(node, result):
         return
     node.wins += result
     node.visits += 1
+    node.uct = node.calcUct()
     backpropogate(node.parent,result)
 def playGame(currentRoot):
 
@@ -183,25 +184,27 @@ def playGame(currentRoot):
     while(not currentRoot.checkWin()):
         if(currentRoot.turn == 0):
             p1Visit.add(currentRoot)
-            (currentRoot,score,allStates) = ABMove(currentRoot, 0,float("-inf"),float("inf"), 7, p1Visit)
+            (currentRoot,score,allStates) = ABMove(currentRoot, 0,float("-inf"),float("inf"), 8, p1Visit)
 
-            # print("MADE MOVE")
-            # print(currentRoot)
+            print("MADE MOVE")
+            print(currentRoot)
             p1Visit.update(allStates)
+            print(count)
             # print(len(allStates))
             totalStates += len(allStates)
-            # print("_____")
+            print("_____")
 
         else:
-            p2Visit.add(currentRoot)
-            # (currentRoot,score,allStates) = ABMove(currentRoot, 0,float("-inf"),float("inf"), 1, p2Visit)
+            # p2Visit.add(currentRoot)
+            (currentRoot,score,allStates) = ABMove(currentRoot, 0,float("-inf"),float("inf"), 4, p2Visit)
 
             currentRoot = mctsMove(currentRoot)
-            # print("MADE MOVE")
-            # print(currentRoot)
-            # p2Visit.update(allStates)
+            print("MADE MOVE")
+            print(currentRoot)
+            p2Visit.update(allStates)
+            print(count)
             # print(len(allStates))
-            # print("______")
+            print("______")
 
 
 
@@ -248,17 +251,18 @@ def main():
     # print("__")
 
 
-
+    gameT = gameTree(5,5)
+    wins = playGame(gameT.root)
 
     ##### PLAY AB GAME #####
-    wins = 0
-    for i in range(30):
-        gameT = gameTree(5, 5)
-        print(i)
-        wins += playGame(gameT.root)
+    # wins = 0
+    # for i in range(30):
+    #     gameT = gameTree(5, 5)
+    #     print(i)
+    #     wins += playGame(gameT.root)
 
-    pct = wins/float(30)
-    print(pct)
+    # pct = wins/float(30)
+    # print(pct)
 
     ##### TEST EXPANDSTATES() #####
     # states = copy.expandStates()

@@ -15,7 +15,7 @@ class state:
         self.selected = 0
         self.wins = 0
         self.parent = p
-        self.utc = 0
+        self.uct = 0
         self.visited = set()
     def __str__(self):
         return ("Player 1's state: " + str(self.players[0].hands) +
@@ -67,7 +67,7 @@ class state:
         newState.visits = 0 #self.visits #0
 
         #does selected need to get changed?
-        newState.utc = newState.calcUtc() #do you need to do this? idk
+        newState.uct = newState.calcUct() #do you need to do this? idk
         return newState
 
 
@@ -169,7 +169,7 @@ class state:
 
                         if copy != self:
                             copy.parent = self
-                            copy.utc = copy.calcUtc()
+                            copy.uct = copy.calcUct()
                             possibleStates.add(copy)
         copy = self.copyState()
         if(not copy.allSame()): #maybe need to change so doesn't affect MCTS
@@ -182,7 +182,7 @@ class state:
             copy.evaluateScore() #changed from 1 to 0.... is this change for the next state?
             if copy != self:
                 copy.parent = self
-                copy.utc = copy.calcUtc()
+                copy.uct = copy.calcUct()
                 possibleStates.add(copy)
 
         possibleStates.remove(self)
@@ -262,9 +262,9 @@ class state:
                   count+=1
           return count
     '''
-    Evaluates the utc score of a given state
+    Evaluates the uct score of a given state
     '''
-    def calcUtc(self):
+    def calcUct(self):
         coeff = .5
         value = 0
         value_2 = 0
