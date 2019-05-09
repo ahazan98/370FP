@@ -98,7 +98,7 @@ def mctsMove(root):
 def resources_left(start_time):
     current_time = time.time()
     # print(current_time)
-    if current_time > start_time + .25: #idk how long to use
+    if current_time > start_time + 3: #idk how long to use
         return False
     return True
 
@@ -122,7 +122,7 @@ def traverse(state):
                 best_state = state.states[index]
         state = best_state
 
-    if state.checkWin(): #return that state if it is a win
+    if state.checkWin(): #return that state if the game is over
         return state
     else: #expand its children and then pick a random one to expand upon
         state.states = list(state.expandStates())
@@ -171,6 +171,7 @@ def backpropogate(node, result):
         return
     node.wins += result
     node.visits += 1
+    backpropogate(node.parent,result)
 def playGame(currentRoot):
 
     count = 0
@@ -195,6 +196,7 @@ def playGame(currentRoot):
         else:
             p2Visit.add(currentRoot)
             (currentRoot,score,allStates) = ABMove(currentRoot, 0,float("-inf"),float("inf"), 1, p2Visit)
+
             # currentRoot = mctsMove(currentRoot)
             print("MADE MOVE")
             print(currentRoot)
