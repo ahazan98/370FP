@@ -178,14 +178,13 @@ def playGame(currentRoot):
     p1Visit = set()
     p2Visit = set()
     totalStates = 0
-    currentRoot = randomMoves(currentRoot)
-    print(currentRoot)
+
 
 
     while(not currentRoot.checkWin()):
         if(currentRoot.turn == 0):
             p1Visit.add(currentRoot)
-            (currentRoot,score,allStates) = ABMove(currentRoot, 0,float("-inf"),float("inf"), 7, p1Visit)
+            (currentRoot,score,allStates) = ABMove(currentRoot, 1,float("-inf"),float("inf"), 2, p1Visit)
             print("MADE MOVE")
             print(currentRoot)
             p1Visit.update(allStates)
@@ -195,7 +194,7 @@ def playGame(currentRoot):
 
         else:
             p2Visit.add(currentRoot)
-            (currentRoot,score,allStates) = ABMove(currentRoot, 0,float("-inf"),float("inf"), 1, p2Visit)
+            (currentRoot,score,allStates) = ABMove(currentRoot, 1,float("-inf"),float("inf"), 6, p2Visit)
 
             # currentRoot = mctsMove(currentRoot)
             print("MADE MOVE")
@@ -250,28 +249,28 @@ def main():
 
 
 
-
+    # print(gameT.root.turn)
 
     ##### PLAY AB GAME #####
     playGame(gameT.root)
-    winners = {"p1" : 0, "p2":0}
-    loops = 0
-    for i in range(30):
-        winner = playGame(gameT.root)
-        print("Player " + str(winner) + " won")
-        if(winner == 1):
-            winners["p1"] += 1
-        elif(winner == 2):
-            winners["p2"] += 1
-        else:
-            print("Caught in loop")
-            loops += 1
-            pass
-        time.sleep(1)
-    print(winners["p1"])
-    print(winners["p2"])
-    print(winners["p2"] / float(winners["p1"] + winners["p2"]))
-    print(loops)
+    # winners = {"p1" : 0, "p2":0}
+    # loops = 0
+    # for i in range(30):
+    #     winner = playGame(gameT.root)
+    #     print("Player " + str(winner) + " won")
+    #     if(winner == 1):
+    #         winners["p1"] += 1
+    #     elif(winner == 2):
+    #         winners["p2"] += 1
+    #     else:
+    #         print("Caught in loop")
+    #         loops += 1
+    #         pass
+    #     time.sleep(1)
+    # print(winners["p1"])
+    # print(winners["p2"])
+    # print(winners["p2"] / float(winners["p1"] + winners["p2"]))
+    # print(loops)
     #### TEST EXPANDSTATES() #####
     # states = copy.expandStates()
     # for state in states:
