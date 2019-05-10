@@ -101,7 +101,7 @@ def mctsMove(root, maxStates):
 def resources_left(start_time, count, maxStates):
     current_time = time.time()
     # print(current_time)
-    if current_time > start_time + 21or count > maxStates: #idk how long to use
+    if current_time > start_time + 1 or count > maxStates: #idk how long to use
         return False
     return True
 
