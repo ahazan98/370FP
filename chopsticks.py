@@ -101,7 +101,7 @@ def mctsMove(root, maxStates):
 def resources_left(start_time, count, maxStates):
     current_time = time.time()
     # print(current_time)
-    if current_time > start_time + 2 or count > maxStates: #idk how long to use
+    if current_time > start_time + 21or count > maxStates: #idk how long to use
         return False
     return True
 
@@ -190,8 +190,8 @@ def playGame(currentRoot):
 
             p1Visit.add(currentRoot)
             (currentRoot,score,allStates) = ABMove(currentRoot, 1,float("-inf"),float("inf"), 6, p1Visit)
-            print("MADE MOVE")
-            print(currentRoot)
+            # print("MADE MOVE")
+            # print(currentRoot)
             p1Visit.update(allStates)
             maxStates = len(allStates)
             totalStates += len(allStates)
@@ -202,8 +202,8 @@ def playGame(currentRoot):
             # (currentRoot,score,allStates) = ABMove(currentRoot, 1,float("-inf"),float("inf"), 6, p2Visit)
 
             currentRoot = mctsMove(currentRoot, maxStates)
-            print("MADE MOVE")
-            print(currentRoot)
+            # print("MADE MOVE")
+            # print(currentRoot)
             p2Visit.update(allStates)
             # print(len(allStates))
             # print("______")
@@ -212,20 +212,20 @@ def playGame(currentRoot):
 
         count+= 1
 
-        print(count)
+        # print(count)
         if(count > 10000):
             return 0
-        print()
+        # print()
     if(currentRoot.turn == 0):
         # print(currentRoot)
-        print("Player 2 has won")
-        print(len(allStates))
-        print(totalStates / float(count))
+        # print("Player 2 has won")
+        # print(len(allStates))
+        # print(totalStates / float(count))
         return 2
     else:
         # print(currentRoot)
         print("Player 1 has won")
-        print(len(allStates))
+        # print(len(allStates))
         print(totalStates / float(count))
         return 1
 
@@ -249,7 +249,7 @@ def randomMoves(currentRoot):
     return currentRoot
 
 def main():
-    gameT = gameTree(5,5)
+    
 
     # currentRoot = randomMoves(gameT.root)
     # (currentRoot,score,allStates) = ABMove(gameT.root, 0,float("-inf"),float("inf"), 10, {gameT.root})
@@ -266,7 +266,16 @@ def main():
     # print(gameT.root.turn)
 
     ##### PLAY AB GAME #####
-    playGame(gameT.root)
+    wins = 0
+    for x in range(30):
+
+        gameT = gameTree(5,5)
+        randomMoves(gameTree.root)
+        r = playGame(gameT.root)
+        if r == 2:
+            wins += 1
+    pct = float(wins)/float(30)
+    print(pct)
     # winners = {"p1" : 0, "p2":0}
     # loops = 0
     # for i in range(30):
