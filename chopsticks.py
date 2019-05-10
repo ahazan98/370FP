@@ -90,8 +90,7 @@ def mctsMove(root, maxStates):
     count = 0
     start_time = time.time()
     root.states = [] #do we need to delete the states from the last player's turn?
-    while resources_left(start_time, count, max
-    States):
+    while resources_left(start_time, count, maxStates):
         leaf = traverse(root)
         simulation_result = rollout(leaf)
         count+= 1
@@ -269,7 +268,7 @@ def main():
     ##### PLAY AB GAME #####
     wins = 0
     for x in range(30):
-
+        print(x)
         gameT = gameTree(5,5)
         randomMoves(gameT.root)
         r = playGame(gameT.root)
