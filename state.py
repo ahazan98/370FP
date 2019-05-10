@@ -92,18 +92,18 @@ class state:
                 else:
                     score = self.players[1].numHands * 10000
 
-        canKill = 0
-        knockoutMoves = set()
-        for i in self.players[0].hands:
-            for j in self.players[1].hands:
-                tuple = (i,j)
-                if(i+j >= self.players[0].numFingers and tuple not in knockoutMoves):
-                    knockoutMoves.add(tuple)
-                    canKill += 1
-        if(self.turn == 0):
-            score += 200 * canKill
-        else:
-            score -= 200 * canKill
+        # canKill = 0
+        # knockoutMoves = set()
+        # for i in self.players[0].hands:
+        #     for j in self.players[1].hands:
+        #         tuple = (i,j)
+        #         if(i+j >= self.players[0].numFingers and tuple not in knockoutMoves):
+        #             knockoutMoves.add(tuple)
+        #             canKill += 1
+        # if(self.turn == 0):
+        #     score += 200 * canKill
+        # else:
+        #     score -= 200 * canKill
         for i in self.players[0].hands:
             if(i == 0):
                 score -= 100
