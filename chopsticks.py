@@ -87,6 +87,7 @@ def ABMove(state, depth, alpha, beta, depthLimit, allStates):
 Determine the best next move while implementing monte carlo tree search
 '''
 def mctsMove(root, maxStates):
+    root.parent = None #need to set this so it doesn't recurse back farther than it needs?
     count = 0
     start_time = time.time()
     root.states = [] #do we need to delete the states from the last player's turn?
@@ -107,8 +108,28 @@ def resources_left(start_time, count, maxStates):
 
 def best_child(root):
     bc = root.states[0]
+    if bc.checkWin():
+
+        p1sum = sum(bc.players[0].hands)
+        p2sum = sum(bc.players[1].hands)
+        if bc.turn == 0 and p2sum == 0:
+            return bc
+        elif bc.turn == 1 and p1sum == 0:
+            return bc
+
     for state in root.states[1:]:
-        if state.visits > bc.visits:
+        if state.checkWin():
+            
+            p1sum = sum(state.players[0].hands)
+            p2sum = sum(state.players[1].hands)
+            
+            time.sleep(60)
+            if state.turn == 0 and p1sum == 0:
+                return state
+            elif state.turn == 1 and p2sum == 0:
+                return state
+        
+        if state.uct > bc.uct:
             bc = state
     return bc
 
@@ -159,23 +180,32 @@ def rollout(start):
     p1sum = sum(curr.players[0].hands)
     p2sum = sum(curr.players[1].hands)
     if turn == 0:
-        if p2sum == 0:
+        if p1sum == 0:
             return 1
         else:
             return 0
     else:
-        if p1sum == 0:
+        if p2sum == 0:
             return 1
         else:
             return 0
 
 def backpropogate(node, result):
+    while node.parent == None:
+        if node.selected == 1:
+            node.wins += result
+            node.visits += 1
+            node.uct = node.calcUct()
+    '''
+    RECURSION BACKPROPOGATE
     if node.parent == None:
         return
     node.wins += result
     node.visits += 1
     node.uct = node.calcUct()
     backpropogate(node.parent,result)
+    '''
+    
 def playGame(currentRoot):
 
     count = 0
@@ -189,7 +219,7 @@ def playGame(currentRoot):
         if(currentRoot.turn == 0):
 
             p1Visit.add(currentRoot)
-            (currentRoot,score,allStates) = ABMove(currentRoot, 1,float("-inf"),float("inf"), 6, p1Visit)
+            (currentRoot,score,allStates) = ABMove(currentRoot, 1,float("-inf"),float("inf"), 8, p1Visit)
             # print("MADE MOVE")
             # print(currentRoot)
             p1Visit.update(allStates)
@@ -204,7 +234,7 @@ def playGame(currentRoot):
             currentRoot = mctsMove(currentRoot, maxStates)
             # print("MADE MOVE")
             # print(currentRoot)
-            p2Visit.update(allStates)
+            # p2Visit.update(allStates)
             # print(len(allStates))
             # print("______")
 
@@ -218,7 +248,7 @@ def playGame(currentRoot):
         # print()
     if(currentRoot.turn == 0):
         # print(currentRoot)
-        # print("Player 2 has won")
+        print("Player 2 has won")
         # print(len(allStates))
         # print(totalStates / float(count))
         return 2
@@ -226,8 +256,15 @@ def playGame(currentRoot):
         # print(currentRoot)
         print("Player 1 has won")
         # print(len(allStates))
-        print(totalStates / float(count))
+        # print(totalStates / float(count))
         return 1
+
+# def randomMoves(currentRoot):
+#     for i in range(4):
+#         states = currentRoot.expandStates()
+#         currentRoot = random.choice(tuple(states))
+#         if(len(currentRoot.expandStates()) == 0):
+#             currentRoot = random.choice(tuple(states))
 
 def randomMoves(currentRoot):
     for i in range(4):
@@ -236,15 +273,8 @@ def randomMoves(currentRoot):
         if(len(currentRoot.expandStates()) == 0):
             currentRoot = random.choice(tuple(states))
 
-def randomMoves(currentRoot):
-    for i in range(5):
-        states = currentRoot.expandStates()
-        currentRoot = random.choice(tuple(states))
-        if(len(currentRoot.expandStates()) == 0):
-            currentRoot = random.choice(tuple(states))
 
-
-    return currentRoot
+    # return currentRoot
 
     return currentRoot
 
@@ -265,13 +295,18 @@ def main():
 
     # print(gameT.root.turn)
 
+    # gameT = gameTree(3,5)
+    # randomMoves(gameT.root)
+    # r = playGame(gameT.root)
+
     ##### PLAY AB GAME #####
     wins = 0
     for x in range(30):
         print(x)
         gameT = gameTree(5,5)
-        randomMoves(gameT.root)
-        r = playGame(gameT.root)
+        currentRoot = randomMoves(gameT.root)
+       
+        r = playGame(currentRoot)
         if r == 2:
             wins += 1
     pct = float(wins)/float(30)
