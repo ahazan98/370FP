@@ -25,31 +25,37 @@ class state:
     def __eq__(self, other):
         if other == None:
             return False
-        p1s1Hands = {}
-        p2s1Hands = {}
-        p1s2Hands = {}
-        p2s2Hands = {}
-        for hand in range(len(self.players[0].hands)):
-            if(self.players[0].hands[hand] in p1s1Hands):
-                p1s1Hands[self.players[0].hands[hand]] += 1
-            else:
-                p1s1Hands[self.players[0].hands[hand]] = 1
-            if(self.players[1].hands[hand] in p2s1Hands):
-                p2s1Hands[self.players[1].hands[hand]] += 1
-            else:
-                p2s1Hands[self.players[1].hands[hand]] = 1
-            if(other.players[0].hands[hand] in p1s2Hands):
-                p1s2Hands[other.players[0].hands[hand]] += 1
-            else:
-                p1s2Hands[other.players[0].hands[hand]] = 1
-            if(other.players[1].hands[hand] in p2s2Hands):
-                p2s2Hands[other.players[1].hands[hand]] += 1
-            else:
-                p2s2Hands[other.players[1].hands[hand]] = 1
-        if(p1s1Hands == p1s2Hands and p2s1Hands == p2s2Hands):
+        
+        selfh1 = set(self.players[0].hands)
+        selfh2 = set(self.players[1].hands)
+        otherh1 = set(other.players[0].hands)
+        otherh2 = set(other.players[1].hands)
+        
+        if (selfh1 - otherh1) == set() or (selfh2 - otherh2) == set():
             return True
         else:
             return False
+        # for hand in range(len(self.players[0].hands)):
+        #     if(self.players[0].hands[hand] in p1s1Hands):
+        #         p1s1Hands[self.players[0].hands[hand]] += 1
+        #     else:
+        #         p1s1Hands[self.players[0].hands[hand]] = 1
+        #     if(self.players[1].hands[hand] in p2s1Hands):
+        #         p2s1Hands[self.players[1].hands[hand]] += 1
+        #     else:
+        #         p2s1Hands[self.players[1].hands[hand]] = 1
+        #     if(other.players[0].hands[hand] in p1s2Hands):
+        #         p1s2Hands[other.players[0].hands[hand]] += 1
+        #     else:
+        #         p1s2Hands[other.players[0].hands[hand]] = 1
+        #     if(other.players[1].hands[hand] in p2s2Hands):
+        #         p2s2Hands[other.players[1].hands[hand]] += 1
+        #     else:
+        #         p2s2Hands[other.players[1].hands[hand]] = 1
+        # if(p1s1Hands == p1s2Hands and p2s1Hands == p2s2Hands):
+        #     return True
+        # else:
+        #     return False
 
     def __hash__(self):
         return hash(tuple(self.players[0].hands)) + hash(tuple(self.players[1].hands))
@@ -82,39 +88,44 @@ class state:
 
             if(self.turn == 0):
                 if p1sum == 0:
-                    score = self.players[0].numHands * -10000
-                else:
                     score = self.players[0].numHands * 10000
+                else:
+                    score = self.players[0].numHands * -10000
 
             else:
                 if p2sum == 0:
-                     score = self.players[1].numHands * -10000
+                     score = self.players[1].numHands * 10000
                 else:
-                    score = self.players[1].numHands * 10000
-
-        canKill = 0
-        knockoutMoves = set()
-        for i in self.players[0].hands:
-            for j in self.players[1].hands:
-                tuple = (i,j)
-                if(i+j >= self.players[0].numFingers and tuple not in knockoutMoves):
-                    knockoutMoves.add(tuple)
-                    canKill += 1
-        if(self.turn == 0):
-            score += 200 * canKill
+                    score = self.players[1].numHands * -10000
         else:
-            score -= 200 * canKill
-        for i in self.players[0].hands:
-            if(i == 0):
-                score -= 100
-            elif(float(i) >= .75 * self.players[0].numFingers or i ==0):
-                score -= 25
+            # canKill = 0
+            # knockoutMoves = set()
+            # for i in self.players[0].hands:
+            #     for j in self.players[1].hands:
+            #         tuple = (i,j)
+            #         if(i+j >= self.players[0].numFingers and tuple not in knockoutMoves):
+            #             knockoutMoves.add(tuple)
+            #             canKill += 1
+            # if(self.turn == 0):
+            #     score += 200 * canKill
+            # else:
+            #     score -= 200 * canKill
+            for i in self.players[0].hands:
+                if(i == 0):
+                    # print("minus 100")
+                    score -= 100
+                elif(float(i) >= .75 * self.players[0].numFingers):
+                    # print("minus 25")
+                    score -= 25
 
-        for i in self.players[1].hands:
-            if(i == 0):
-                score += 100
-            elif(float(i) >= .75 * self.players[1].numFingers or i==0):
-                score += 25
+            for i in self.players[1].hands:
+                if(i == 0):
+                    # print("plus 100")
+                    score += 100
+                elif(float(i) >= .75 * self.players[1].numFingers ):
+                    # print("plus 25")
+
+                    score += 25
 
         return score
 
@@ -270,20 +281,19 @@ class state:
         value = 0
         value_2 = 0
         #if a state doesn't have a parent, also uses it in ABmove
+        
         if self.parent == None:
             return 0
         else:
-
-            if self.visits == 0:
+            if self.visits == 0 or self.wins == 0:
                 value = 0
+            else: 
+                value = self.wins/self.visits
+            if self.visits == 0 or self.parent.visits == 0:
                 value_2 = 0
-            if self.parent.visits == 0:
-                value_2 = 0
-            if self.wins == 0:
-                value = 0
-            else:
-                value = self.wins /self.visits
-
+            else: 
                 value_2 = math.sqrt(math.log10(self.parent.visits)/self.visits)
+
+                
             score = value + coeff * value_2
             return score

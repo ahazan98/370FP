@@ -109,28 +109,28 @@ def resources_left(start_time, count, maxStates):
 def best_child(root):
     bc = root.states[0]
     if bc.checkWin():
+        print("here")
 
         p1sum = sum(bc.players[0].hands)
         p2sum = sum(bc.players[1].hands)
-        if bc.turn == 0 and p2sum == 0:
+        if bc.turn == 0 and p1sum == 0:
             return bc
-        elif bc.turn == 1 and p1sum == 0:
+        elif bc.turn == 1 and p2sum == 0:
             return bc
-
+        print("done")
     for state in root.states[1:]:
         if state.checkWin():
-            
+            print("here2")
             p1sum = sum(state.players[0].hands)
             p2sum = sum(state.players[1].hands)
             
-            time.sleep(60)
             if state.turn == 0 and p1sum == 0:
                 return state
             elif state.turn == 1 and p2sum == 0:
                 return state
-        
-        if state.uct > bc.uct:
-            bc = state
+        else:
+            if state.uct > bc.uct:
+                bc = state
     return bc
 
 def traverse(state):
@@ -152,7 +152,7 @@ def traverse(state):
         state.states = list(state.expandStates())
         rand_child = random.randint(0,len(state.states)-1)
         state.states[rand_child].selected = 1
-        return state.states[rand_child]
+        return state.states[rand_child] 
 
 def isBoundary(state):
 
@@ -191,11 +191,12 @@ def rollout(start):
             return 0
 
 def backpropogate(node, result):
-    while node.parent == None:
+    while node.parent != None:
         if node.selected == 1:
             node.wins += result
             node.visits += 1
             node.uct = node.calcUct()
+        node = node.parent
     '''
     RECURSION BACKPROPOGATE
     if node.parent == None:
@@ -220,8 +221,8 @@ def playGame(currentRoot):
 
             p1Visit.add(currentRoot)
             (currentRoot,score,allStates) = ABMove(currentRoot, 1,float("-inf"),float("inf"), 8, p1Visit)
-            # print("MADE MOVE")
-            # print(currentRoot)
+            print("MADE MOVE")
+            print(currentRoot)
             p1Visit.update(allStates)
             maxStates = len(allStates)
             totalStates += len(allStates)
@@ -232,8 +233,8 @@ def playGame(currentRoot):
             # (currentRoot,score,allStates) = ABMove(currentRoot, 1,float("-inf"),float("inf"), 6, p2Visit)
 
             currentRoot = mctsMove(currentRoot, maxStates)
-            # print("MADE MOVE")
-            # print(currentRoot)
+            print("MADE MOVE")
+            print(currentRoot)
             # p2Visit.update(allStates)
             # print(len(allStates))
             # print("______")
@@ -242,7 +243,7 @@ def playGame(currentRoot):
 
         count+= 1
 
-        # print(count)
+        print(count)
         if(count > 10000):
             return 0
         # print()
@@ -280,104 +281,45 @@ def randomMoves(currentRoot):
 
 def main():
     
-
-    # currentRoot = randomMoves(gameT.root)
-    # (currentRoot,score,allStates) = ABMove(gameT.root, 0,float("-inf"),float("inf"), 10, {gameT.root})
-    # print(len(allStates))
-
-    # print("__")
-    # (currentRoot,score,allStates) = ABMove(currentRoot, 0,float("-inf"),float("inf"), 1, allStates)
-    # print("__")
-    # (currentRoot,score,allStates) = ABMove(currentRoot, 0,float("-inf"),float("inf"), 1, allStates)
-    # print("__")
-
-
-
-    # print(gameT.root.turn)
-
+    ##### TESTING SCORING#####
     # gameT = gameTree(3,5)
-    # randomMoves(gameT.root)
-    # r = playGame(gameT.root)
+    # gameT.root.players[0].hands = [1,4,2]
+    # gameT.root.players[1].hands = [1,0,0]
 
-    ##### PLAY AB GAME #####
-    wins = 0
-    for x in range(30):
-        print(x)
-        gameT = gameTree(5,5)
-        currentRoot = randomMoves(gameT.root)
-       
-        r = playGame(currentRoot)
-        if r == 2:
-            wins += 1
-    pct = float(wins)/float(30)
-    print(pct)
-    # winners = {"p1" : 0, "p2":0}
-    # loops = 0
-    # for i in range(30):
-    #     winner = playGame(gameT.root)
-    #     print("Player " + str(winner) + " won")
-    #     if(winner == 1):
-    #         winners["p1"] += 1
-    #     elif(winner == 2):
-    #         winners["p2"] += 1
-    #     else:
-    #         print("Caught in loop")
-    #         loops += 1
-    #         pass
-    #     time.sleep(1)
-    # print(winners["p1"])
-    # print(winners["p2"])
-    # print(winners["p2"] / float(winners["p1"] + winners["p2"]))
-    # print(loops)
-    #### TEST EXPANDSTATES() #####
-    # states = copy.expandStates()
-    # for state in states:
-    #     print(state)
-
-    ##### COLLECTION OF AB MOVES ######
-    # print("pre turn: " + str(copy.turn))
-    # nextState = ABMove(copy, 0,float("-inf"),float("inf"), 5)[0]
-    # print(nextState)
-    # print("post turn: " + str(nextState.turn))
-
-    # nextState = ABMove(nextState, 0,float("-inf"),float("inf"), 5)[0]
-    # print
-    # print(nextState)
-
-    ##### TESTING MAKE MOVE ANYWAYS ###### (this works, but why doesn't it change with evaluate state?)
-    # print(copy)
-    # copy.makeTurn(0,0,False)
-    # print(copy)
-
-
-
-    # print(gameT.root)
-
-
-    # gameT.allStates.add(gameT.root)
-    # state = ABMove(gameT.root, 0, float("-inf"), float("inf"), 10)[0]
-    # state = ABMove(state,0, float("-inf"), float("inf"), 10)[0]
-    # print(state)
-
+    # gameT2 = gameTree(3,5)
+    # gameT2.root.players[0].hands = [1,4,2]
+    # gameT2.root.players[1].hands = [0,1,0]
+    # gameT2.root.turn = 1
+    # print(gameT.root == gameT2.root)
+    # # print(gameT.root)
+    # # print(gameT.root.evaluateScore())
     # gameT.root.states = gameT.root.expandStates()
-
     # for state in gameT.root.states:
     #     print(state)
     #     print(state.score)
+   
+    
+    ##### ONE GAME #####
+    gameT = gameTree(3,5)
+    randomMoves(gameT.root)
+    r = playGame(gameT.root)
 
+    ##### 30 game #####
+    # wins = 0
+    # for x in range(30):
+    #     print(x)
+    #     gameT = gameTree(5,5)
+    #     currentRoot = randomMoves(gameT.root)
+       
+    #     r = playGame(currentRoot)
+    #     if r == 2:
+    #         wins += 1
+    # pct = float(wins)/float(30)x
+    # print(pct)
 
-    #
-    # print("_____")
-    #
-    #     if(state.checkWin()):
-    #
-    #         print("_______")
-    #         print("Victory")
-    #         print("_______")
-    #
-    #
-    #
-    #
-    # print(len(gameT.allStates))
+    #changes: backpropogate changes, and scoring rationale
+
+    
+    
 if __name__ == "__main__":
     main()
