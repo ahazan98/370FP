@@ -62,8 +62,7 @@ def ABMove(state, depth, alpha, beta, depthLimit, allStates):
             bestVal = float("inf")
 
             for Nstate in states:
-                # print("Nstate")
-                # print(Nstate)
+                
                 result = ABMove(Nstate, depth+1, alpha, beta, depthLimit, allStates)
 
                 if(result[1] < bestVal):
@@ -88,6 +87,7 @@ Determine the best next move while implementing monte carlo tree search
 '''
 def mctsMove(root, maxStates):
     root.parent = None #need to set this so it doesn't recurse back farther than it needs?
+    root.selected = 1
     count = 0
     start_time = time.time()
     root.states = [] #do we need to delete the states from the last player's turn?
@@ -101,7 +101,6 @@ def mctsMove(root, maxStates):
 
 def resources_left(start_time, count, maxStates):
     current_time = time.time()
-    # print(current_time)
     if current_time > start_time + 1 or count > maxStates: #idk how long to use
         return False
     return True
@@ -109,7 +108,6 @@ def resources_left(start_time, count, maxStates):
 def best_child(root):
     bc = root.states[0]
     if bc.checkWin():
-        print("here")
 
         p1sum = sum(bc.players[0].hands)
         p2sum = sum(bc.players[1].hands)
@@ -117,10 +115,8 @@ def best_child(root):
             return bc
         elif bc.turn == 1 and p2sum == 0:
             return bc
-        print("done")
     for state in root.states[1:]:
         if state.checkWin():
-            print("here2")
             p1sum = sum(state.players[0].hands)
             p2sum = sum(state.players[1].hands)
             
@@ -165,6 +161,7 @@ def isBoundary(state):
                     return False
             return True
     else: #if it hasn't been selected, then something is messed up and should let us know
+        # print("here")
         return -1
 
 def rollout(start):
