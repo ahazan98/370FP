@@ -218,8 +218,8 @@ def playGame(currentRoot):
 
             p1Visit.add(currentRoot)
             (currentRoot,score,allStates) = ABMove(currentRoot, 1,float("-inf"),float("inf"), 8, p1Visit)
-            print("MADE MOVE")
-            print(currentRoot)
+            # print("MADE MOVE")
+            # print(currentRoot)
             p1Visit.update(allStates)
             maxStates = len(allStates)
             totalStates += len(allStates)
@@ -230,8 +230,8 @@ def playGame(currentRoot):
             # (currentRoot,score,allStates) = ABMove(currentRoot, 1,float("-inf"),float("inf"), 6, p2Visit)
 
             currentRoot = mctsMove(currentRoot, maxStates)
-            print("MADE MOVE")
-            print(currentRoot)
+            # print("MADE MOVE")
+            # print(currentRoot)
             # p2Visit.update(allStates)
             # print(len(allStates))
             # print("______")
@@ -240,7 +240,7 @@ def playGame(currentRoot):
 
         count+= 1
 
-        print(count)
+        # print(count)
         if(count > 10000):
             return 0
         # print()
@@ -297,22 +297,22 @@ def main():
    
     
     ##### ONE GAME #####
-    gameT = gameTree(3,5)
-    randomMoves(gameT.root)
-    r = playGame(gameT.root)
+    # gameT = gameTree(3,5)
+    # randomMoves(gameT.root)
+    # r = playGame(gameT.root)
 
     ##### 30 game #####
-    # wins = 0
-    # for x in range(30):
-    #     print(x)
-    #     gameT = gameTree(5,5)
-    #     currentRoot = randomMoves(gameT.root)
+    wins = 0
+    for x in range(30):
+        print(x)
+        gameT = gameTree(5,5)
+        currentRoot = randomMoves(gameT.root)
        
-    #     r = playGame(currentRoot)
-    #     if r == 2:
-    #         wins += 1
-    # pct = float(wins)/float(30)x
-    # print(pct)
+        r = playGame(currentRoot)
+        if r == 2:
+            wins += 1
+    pct = float(wins)/float(30)
+    print(pct)
 
     #changes: backpropogate changes, and scoring rationale
 
