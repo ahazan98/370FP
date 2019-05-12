@@ -87,9 +87,9 @@ class state:
 
             else:
                 if p2sum == 0:
-                     score = self.players[1].numHands * -10000
+                     score = self.players[1].numHands * 10000
                 else:
-                    score = self.players[1].numHands * 10000
+                    score = self.players[1].numHands * -10000
 
         # canKill = 0
         # knockoutMoves = set()
