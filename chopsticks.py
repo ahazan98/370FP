@@ -50,10 +50,10 @@ def ABMove(state, depth, alpha, beta, depthLimit, allStates):
                 if(result[1] > bestVal):
                     bestVal = result[1]
                     bestState = Nstate
-                # if(bestVal > alpha):
-                #     alpha = bestVal
-                # if beta <= alpha:
-                #     break
+                if(bestVal > alpha):
+                    alpha = bestVal
+                if beta <= alpha:
+                    break
                 # # else:
                 # allStates.add(Nstate)
 
@@ -70,12 +70,12 @@ def ABMove(state, depth, alpha, beta, depthLimit, allStates):
                     bestVal = result[1]
                     bestState = Nstate
 
-                # if(bestVal < beta):
-                #     beta = bestVal
-                # # print("beta: "+str(beta))
-                # if beta <= alpha:
-                #     # print("here")
-                #     break
+                if(bestVal < beta):
+                    beta = bestVal
+                # print("beta: "+str(beta))
+                if beta <= alpha:
+                    # print("here")
+                    break
                 # else:
                 # allStates.add(Nstate)
 
