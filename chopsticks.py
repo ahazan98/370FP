@@ -38,15 +38,15 @@ def ABMove(state, depth, alpha, beta, depthLimit, allStates):
             else:
                 allStates.add(state)
 
-
+        
         if len(states) == 0:
             return(state, state.evaluateScore(), allStates)
         bestState = state
-        if(state.turn == 0):
+        if(state.turn == 1):
             bestVal = float("-inf")
             for Nstate in states:
                 result = ABMove(Nstate, depth+1, alpha, beta, depthLimit, allStates)
-
+                # print(str(result[1]) + ", " + str(bestVal))
                 if(result[1] > bestVal):
                     bestVal = result[1]
                     bestState = Nstate
@@ -273,40 +273,30 @@ def randomMoves(currentRoot):
     return currentRoot
 
 def main():
-    # gameT = gameTree(5,3)
-    #
-    #
-    # ##### PLAY AB GAME #####
-    # winner = playGame(gameT.root,0)
-    #
-    # print(winner[1])
-    #
-    # gameT = gameTree(5,5)
-    #
-    #
-    # ##### PLAY AB GAME #####
-    # winner = playGame(gameT.root,0)
-    #
-    # print(winner[1])
+    # tree = gameTree(3,5)
+    # root = tree.root
+    # root.players[0].hands = [0,4,3]
+    # root.players[1].hands = [0,1,0]
+    # root.turn = 0
+    # p1Visit = set()
+    # root.states = root.expandStates()
+    # for state in root.states:
+    #     print(state)
+    #     print(state.score)
 
-    # gameT = gameTree(5,7)
-    #
-    #
-    # ##### PLAY AB GAME #####
-    # winner = playGame(gameT.root,0)
-    #
-    # print(winner[1])
-   
+    # (currentRoot,score,allStates) = ABMove(root, 1,float("-inf"),float("inf"),2 , p1Visit)
+    # print(currentRoot)
+    # print(currentRoot.score)
+    # print("MADE MOVE")
 
 
     ##### PLAY AB GAME #####
-    # winner = playGame(gameT.root,0)
-    #
-    # print(winner[1])
+    
     winners = {"p1" : 0, "p2":0}
     loops = 0
     count = 0
     for i in range(30):
+        print(i)
         gameT = gameTree(5,5)
         winner = playGame(gameT.root, i)
 
@@ -319,15 +309,17 @@ def main():
             count+= winner[1]
         else:
             print("Caught in loop")
-            loops += 1
+            loops += 1 
             pass
         print(winners["p2"] / float(winners["p1"] + winners["p2"]))
         time.sleep(3)
-    # print(winners["p1"])
-    # print(winners["p2"])
-    # print(winners["p1"] / float(winners["p1"] + winners["p2"]))
-    # print(count / float(30))
-    # print(loops)
+    print(winners["p1"])
+    print(winners["p2"])
+    print(winners["p2"] / float(winners["p1"] + winners["p2"]))
+    print(count / float(30))
+    print(loops)
+
+
     #### TEST EXPANDSTATES() #####
     # states = copy.expandStates()
     # for state in states:
@@ -367,7 +359,7 @@ def main():
     ##### ONE GAME #####
     # gameT = gameTree(3,5)
     # randomMoves(gameT.root)
-    # r = playGame(gameT.root)
+    # r = playGame(gameT.root, 1)
 
     ##### 30 game #####
     # wins = 0
