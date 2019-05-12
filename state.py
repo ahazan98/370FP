@@ -9,7 +9,6 @@ class state:
         self.players = [player1, player2]
         self.turn = turn
         self.states = []
-
         self.score = 0
         self.visits = 0
         self.selected = 0
@@ -88,46 +87,42 @@ class state:
 
             if(self.turn == 0):
                 if p1sum == 0:
-                    score = self.players[0].numHands * 10000
-                else:
                     score = self.players[0].numHands * -10000
+                else:
+                    score = self.players[0].numHands * 10000
 
             else:
                 if p2sum == 0:
-                     score = self.players[1].numHands * 10000
+                     score = self.players[1].numHands * -10000
                 else:
-                    score = self.players[1].numHands * -10000
-        else:
-            # canKill = 0
-            # knockoutMoves = set()
-            # for i in self.players[0].hands:
-            #     for j in self.players[1].hands:
-            #         tuple = (i,j)
-            #         if(i+j >= self.players[0].numFingers and tuple not in knockoutMoves):
-            #             knockoutMoves.add(tuple)
-            #             canKill += 1
-            # if(self.turn == 0):
-            #     score += 200 * canKill
-            # else:
-            #     score -= 200 * canKill
-            for i in self.players[0].hands:
-                if(i == 0):
-                    # print("minus 100")
-                    score -= 100
-                elif(float(i) >= .75 * self.players[0].numFingers):
-                    # print("minus 25")
-                    score -= 25
+                    score = self.players[1].numHands * 10000
 
-            for i in self.players[1].hands:
-                if(i == 0):
-                    # print("plus 100")
-                    score += 100
-                elif(float(i) >= .75 * self.players[1].numFingers ):
-                    # print("plus 25")
+        # canKill = 0
+        # knockoutMoves = set()
+        # for i in self.players[0].hands:
+        #     for j in self.players[1].hands:
+        #         tuple = (i,j)
+        #         if(i+j >= self.players[0].numFingers and tuple not in knockoutMoves):
+        #             knockoutMoves.add(tuple)
+        #             canKill += 1
+        # if(self.turn == 0):
+        #     score += 200 * canKill
+        # else:
+        #     score -= 200 * canKill
+        for i in self.players[0].hands:
+            if(i == 0):
+                score -= 100
+            elif(float(i) >= .75 * self.players[0].numFingers or i ==0):
+                score -= 25
 
-                    score += 25
+        for i in self.players[1].hands:
+            if(i == 0):
+                score += 100
+            elif(float(i) >= .75 * self.players[1].numFingers or i==0):
+                score += 25
 
         return score
+
 
     '''
     check if a player has won the game
@@ -277,7 +272,7 @@ class state:
     Evaluates the uct score of a given state
     '''
     def calcUct(self):
-        coeff = .5
+        coeff = .3
         value = 0
         value_2 = 0
         #if a state doesn't have a parent, also uses it in ABmove
