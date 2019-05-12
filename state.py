@@ -9,7 +9,6 @@ class state:
         self.players = [player1, player2]
         self.turn = turn
         self.states = []
-
         self.score = 0
         self.visits = 0
         self.selected = 0

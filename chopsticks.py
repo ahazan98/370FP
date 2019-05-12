@@ -101,7 +101,7 @@ def mctsMove(root, maxStates):
 def resources_left(start_time, count, maxStates):
     current_time = time.time()
     # print(current_time)
-    if current_time > start_time + 2 or count > maxStates: #idk how long to use
+    if current_time > start_time + 3 or count > maxStates: #idk how long to use
         return False
     return True
 
@@ -201,9 +201,9 @@ def playGame(currentRoot , gameNum):
 
         else:
             p2Visit.add(currentRoot)
-            (currentRoot,score,allStates) = ABMove(currentRoot, 1,float("-inf"),float("inf"), 6, p2Visit)
+            # (currentRoot,score,allStates) = ABMove(currentRoot, 1,float("-inf"),float("inf"), 2, p2Visit)
 
-            # currentRoot = mctsMove(currentRoot, maxStates)
+            currentRoot = mctsMove(currentRoot, maxStates)
             print("MADE MOVE")
             print(currentRoot)
             print(len(allStates))
@@ -216,10 +216,10 @@ def playGame(currentRoot , gameNum):
         count+= 1
 
         print(count)
-        print(gameNum)
+        # print(gameNum)
         if(count > 10000):
-            return 0
-        print()
+            return 0,0
+        # print()
     if(currentRoot.turn == 0):
         # print(currentRoot)
         print("Player 2 has won")
@@ -248,47 +248,55 @@ def randomMoves(currentRoot):
     return currentRoot
 
 def main():
-    gameT = gameTree(5,9)
+    # gameT = gameTree(5,3)
+    #
+    #
+    # ##### PLAY AB GAME #####
+    # winner = playGame(gameT.root,0)
+    #
+    # print(winner[1])
+    #
+    # gameT = gameTree(5,5)
+    #
+    #
+    # ##### PLAY AB GAME #####
+    # winner = playGame(gameT.root,0)
+    #
+    # print(winner[1])
 
-    # currentRoot = randomMoves(gameT.root)
-    # (currentRoot,score,allStates) = ABMove(gameT.root, 0,float("-inf"),float("inf"), 10, {gameT.root})
-    # print(len(allStates))
+    # gameT = gameTree(5,7)
+    #
+    #
+    # ##### PLAY AB GAME #####
+    # winner = playGame(gameT.root,0)
+    #
+    # print(winner[1])
+    gameT = gameTree(5,5)
 
-    # print("__")
-    # (currentRoot,score,allStates) = ABMove(currentRoot, 0,float("-inf"),float("inf"), 1, allStates)
-    # print("__")
-    # (currentRoot,score,allStates) = ABMove(currentRoot, 0,float("-inf"),float("inf"), 1, allStates)
-    # print("__")
-
-
-
-    # print(gameT.root.turn)
-    # print(gameT.root.turn)
-    # print(state)
 
     ##### PLAY AB GAME #####
-    winner = playGame(gameT.root,0)
-
-    print(winner[1])
-    # winners = {"p1" : 0, "p2":0}
-    # loops = 0
-    # count = 0
-    # for i in range(30):
-    #     winner = playGame(gameT.root, i)
+    # winner = playGame(gameT.root,0)
     #
-    #     print("Player " + str(winner) + " won")
-    #     if(winner[0] == 1):
-    #         winners["p1"] += 1
-    #         count+= winner[1]
-    #     elif(winner[0] == 2):
-    #         winners["p2"] += 1
-    #         count+= winner[1]
-    #     else:
-    #         print("Caught in loop")
-    #         loops += 1
-    #         pass
-    #     print(winners["p1"] / float(winners["p1"] + winners["p2"]))
-    #     time.sleep(3)
+    # print(winner[1])
+    winners = {"p1" : 0, "p2":0}
+    loops = 0
+    count = 0
+    for i in range(30):
+        winner = playGame(gameT.root, i)
+
+        print("Player " + str(winner) + " won")
+        if(winner[0] == 1):
+            winners["p1"] += 1
+            count+= winner[1]
+        elif(winner[0] == 2):
+            winners["p2"] += 1
+            count+= winner[1]
+        else:
+            print("Caught in loop")
+            loops += 1
+            pass
+        print(winners["p1"] / float(winners["p1"] + winners["p2"]))
+        time.sleep(3)
     # print(winners["p1"])
     # print(winners["p2"])
     # print(winners["p1"] / float(winners["p1"] + winners["p2"]))
