@@ -272,7 +272,7 @@ class state:
     Evaluates the uct score of a given state
     '''
     def calcUct(self):
-        coeff = .4
+        coeff = .5
         value = 0
         value_2 = 0
         #if a state doesn't have a parent, also uses it in ABmove
@@ -287,8 +287,13 @@ class state:
             if self.visits == 0 or self.parent.visits == 0:
                 value_2 = 0
             else: 
-                value_2 = math.sqrt(math.log10(self.parent.visits)/self.visits)
+                value_2 = math.sqrt(math.log(self.parent.visits)/self.visits)
 
                 
             score = value + coeff * value_2
             return score
+
+'''
+terminal 1: ln with .5
+terminal 2: ln with .9
+'''
