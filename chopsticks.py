@@ -97,11 +97,12 @@ def mctsMove(root, maxStates):
         count+= 1
         backpropogate(leaf,simulation_result)
 
-    return best_child(root) #child with highest number of visits
+    return best_child(root) 
 
 def resources_left(start_time, count, maxStates):
     current_time = time.time()
     if current_time > start_time + 1 or count > maxStates: #idk how long to use
+        
         return False
     return True
 
@@ -189,10 +190,12 @@ def rollout(start):
 
 def backpropogate(node, result):
     while node.parent != None:
-        if node.selected == 1:
-            node.wins += result
-            node.visits += 1
-            node.uct = node.calcUct()
+        # if node.selected == 1:
+        node.wins += result
+        node.visits += 1
+        oldUct = node.uct
+        node.uct = node.calcUct()
+        # print("old uct: " + str(oldUct) + ",  to: " + str(node.uct))
         node = node.parent
     '''
     RECURSION BACKPROPOGATE
@@ -311,7 +314,7 @@ def main():
     while games <= 29:
     # for i in range(30):
         print(games)
-        gameT = gameTree(5,5)
+        gameT = gameTree(4,5)
         winner = playGame(gameT.root, games)
 
         print("Player " + str(winner) + " won")
