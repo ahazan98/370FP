@@ -42,7 +42,7 @@ def ABMove(state, depth, alpha, beta, depthLimit, allStates):
         if len(states) == 0:
             return(state, state.evaluateScore(), allStates)
         bestState = states[0]
-        if(state.turn == 1):
+        if(state.turn == 0):
             bestVal = float("-inf")
             for Nstate in states:
                 result = ABMove(Nstate, depth+1, alpha, beta, depthLimit, allStates)
@@ -217,9 +217,9 @@ def playGame(currentRoot , gameNum):
         if(currentRoot.turn == 0):
 
             p1Visit.add(currentRoot)
-            (currentRoot,score,allStates) = ABMove(currentRoot, 1,float("-inf"),float("inf"), 8, p1Visit)
-            # print("MADE MOVE")
-            # print(currentRoot)
+            (currentRoot,score,allStates) = ABMove(currentRoot, 1,float("-inf"),float("inf"), 6, p1Visit)
+            print("MADE MOVE")
+            print(currentRoot)
             p1Visit.update(allStates)
             maxStates = len(allStates)
             # print(maxStates)
@@ -231,8 +231,8 @@ def playGame(currentRoot , gameNum):
             # (currentRoot,score,allStates) = ABMove(currentRoot, 1,float("-inf"),float("inf"), 8, p2Visit)
             currentRoot = mctsMove(currentRoot, maxStates)
 
-            # print("MADE MOVE")
-            # print(currentRoot)
+            print("MADE MOVE")
+            print(currentRoot)
             # print(len(allStates))
             # p2Visit.update(allStates)
             # maxStates = len(allStates)
@@ -244,7 +244,7 @@ def playGame(currentRoot , gameNum):
 
         count+= 1
 
-        # print(count)
+        print(count)
         # print(gameNum)
         if(count > 10000):
             return 0,0
@@ -275,23 +275,23 @@ def randomMoves(currentRoot):
     return currentRoot
 
 def main():
-    tree = gameTree(3,5)
-    root = tree.root
-    root.players[0].hands = [0,4,3]
-    root.players[1].hands = [0,1,0]
-    root.turn = 0
-    p1Visit = set()
+    # tree = gameTree(3,5)
+    # root = tree.root
+    # root.players[0].hands = [0,4,3]
+    # root.players[1].hands = [0,1,0]
+    # root.turn = 0
+    # p1Visit = set()
     # root.states = root.expandStates()
     # for state in root.states:
     #     print(state)
     #     print(state.score)
 
     # (currentRoot,score,allStates) = ABMove(root, 1,float("-inf"),float("inf"),2 , p1Visit)
-    currentRoot = mctsMove(root, float("inf"))
+    # currentRoot = mctsMove(root, float("inf"))
 
-    print(currentRoot)
-    print(currentRoot.score)
-    print("MADE MOVE")
+    # print(currentRoot)
+    # print(currentRoot.score)
+    # print("MADE MOVE")
 
 
     ##### PLAY AB GAME #####
@@ -346,9 +346,9 @@ def main():
     
     
     ##### ONE GAME #####
-    # gameT = gameTree(3,5)
-    # randomMoves(gameT.root)
-    # r = playGame(gameT.root, 1)
+    gameT = gameTree(3,5)
+    randomMoves(gameT.root)
+    r = playGame(gameT.root, 1)
 
     
 
