@@ -101,8 +101,11 @@ def mctsMove(root, maxStates):
 
 def resources_left(start_time, count, maxStates):
     current_time = time.time()
-    if current_time > start_time + 1 or count > maxStates: #idk how long to use
-        
+    if count > maxStates: #idk how long to usecurrent_time > start_time + 60 or 
+        if count > maxStates:
+            print(str(count) + ", " + str(maxStates))
+        else:
+            print("time")
         return False
     return True
 
@@ -306,38 +309,42 @@ def main():
 
 
     ##### PLAY AB GAME #####
-    
-    winners = {"p1" : 0, "p2":0}
-    loops = 0
-    count = 0
-    games = 0
-    while games <= 29:
-    # for i in range(30):
-        print(games)
-        gameT = gameTree(4,5)
-        winner = playGame(gameT.root, games)
+    results = open("results.txt","w")
+    params = [8,6,5,4,3,2]
+    for hands in params:
+        header = "Playing with " + str(hands) " hands\n\n"
+        results.write(header)
+        winners = {"p1" : 0, "p2":0}
+        loops = 0
+        count = 0
+        games = 0
+        while games <= 29:
+        # for i in range(30):
+            print(games)
+            gameT = gameTree(hands,5)
+            winner = playGame(gameT.root, games)
 
-        print("Player " + str(winner) + " won")
-        if(winner[0] == 1):
-            winners["p1"] += 1
-            count+= winner[1]
-        elif(winner[0] == 2):
-            winners["p2"] += 1
-            count+= winner[1]
-        else:
-            print("Caught in loop")
-            loops += 1
-            games -= 1 
-            pass
-        print(winners["p2"] / float(winners["p1"] + winners["p2"]))
-        # time.sleep(3)
-        games += 1
-    print(winners["p1"])
-    print(winners["p2"])
-    print(winners["p2"] / float(winners["p1"] + winners["p2"]))
-    print(count / float(30))
-    print(loops)
-
+            print("Player " + str(winner) + " won")
+            if(winner[0] == 1):
+                winners["p1"] += 1
+                count+= winner[1]
+            elif(winner[0] == 2):
+                winners["p2"] += 1
+                count+= winner[1]
+            else:
+                print("Caught in loop")
+                loops += 1
+                games -= 1 
+                pass
+            print(winners["p2"] / float(winners["p1"] + winners["p2"]))
+            # time.sleep(3)
+            games += 1
+        results.write("AB won "str(winners["p1"]) + " times\n")
+        results.write("MCTS won "str(winners["p2"]) + " times\n")
+        results.write("MCTS won " + str(winners["p2"] / float(winners["p1"] + winners["p2"]) + " percent of the time\n"))
+        print(count / float(30))
+        print(loops)
+    results.close()
 
     #### TEST EXPANDSTATES() #####
     # states = copy.expandStates()
