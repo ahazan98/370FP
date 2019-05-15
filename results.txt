@@ -1,3 +1,25 @@
-AB won 21 times
-MCTS won 9 times
-MCTS won 0.3 percent of the time
+Playing with 3 hands
+AB won 15 times
+MCTS won 15 times
+MCTS won 0.5 percent of the time
+
+Playing with 4 hands
+AB won 19 times
+MCTS won 11 times
+MCTS won 0.366666666667 percent of the time
+
+Playing with 5 hands
+AB won 17 times
+MCTS won 13 times
+MCTS won 0.433333333333 percent of the time
+
+Playing with 6 hands
+AB won 17 times
+MCTS won 13 times
+MCTS won 0.433333333333 percent of the time
+
+Playing with 7 hands
+AB won 16 times
+MCTS won 14 times
+MCTS won 0.466666666667 percent of the time
+

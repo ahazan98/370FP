@@ -5,7 +5,7 @@ import random
 from player import player
 #State has two players
 class state:
-    def __init__(self, player1, player2, turn, p=None): #need to add parent node to all states (ugh)
+    def __init__(self, player1, player2, turn, p=None): 
         self.players = [player1, player2]
         self.turn = turn
         self.states = []
@@ -34,27 +34,7 @@ class state:
             return True
         else:
             return False
-        # for hand in range(len(self.players[0].hands)):
-        #     if(self.players[0].hands[hand] in p1s1Hands):
-        #         p1s1Hands[self.players[0].hands[hand]] += 1
-        #     else:
-        #         p1s1Hands[self.players[0].hands[hand]] = 1
-        #     if(self.players[1].hands[hand] in p2s1Hands):
-        #         p2s1Hands[self.players[1].hands[hand]] += 1
-        #     else:
-        #         p2s1Hands[self.players[1].hands[hand]] = 1
-        #     if(other.players[0].hands[hand] in p1s2Hands):
-        #         p1s2Hands[other.players[0].hands[hand]] += 1
-        #     else:
-        #         p1s2Hands[other.players[0].hands[hand]] = 1
-        #     if(other.players[1].hands[hand] in p2s2Hands):
-        #         p2s2Hands[other.players[1].hands[hand]] += 1
-        #     else:
-        #         p2s2Hands[other.players[1].hands[hand]] = 1
-        # if(p1s1Hands == p1s2Hands and p2s1Hands == p2s2Hands):
-        #     return True
-        # else:
-        #     return False
+        
 
     def __hash__(self):
         return hash(tuple(self.players[0].hands)) + hash(tuple(self.players[1].hands))
@@ -69,10 +49,10 @@ class state:
         newPlayer2.hands = self.players[1].hands[:]
 
         newState = state(newPlayer1, newPlayer2, self.turn,self.parent)
-        newState.visits = 0 #self.visits #0
+        newState.visits = 0 
 
-        #does selected need to get changed?
-        newState.uct = newState.calcUct() #do you need to do this? idk
+      
+        newState.uct = newState.calcUct()
         return newState
 
 
@@ -97,18 +77,7 @@ class state:
                 else:
                     score = self.players[1].numHands * -10000
 
-        # canKill = 0
-        # knockoutMoves = set()
-        # for i in self.players[0].hands:
-        #     for j in self.players[1].hands:
-        #         tuple = (i,j)
-        #         if(i+j >= self.players[0].numFingers and tuple not in knockoutMoves):
-        #             knockoutMoves.add(tuple)
-        #             canKill += 1
-        # if(self.turn == 0):
-        #     score += 200 * canKill
-        # else:
-        #     score -= 200 * canKill
+        
         for i in self.players[0].hands:
             if(i == 0):
                 score -= 100
@@ -134,16 +103,7 @@ class state:
             return True
         else:
             return False
-        # if(self.turn == 0):
-        #     if sum(self.players[1].hands) == 0:
-        #         return True
-        #     else:
-        #         return False
-        # else:
-        #     if sum(self.players[0].hands) == 0:
-        #         return True
-        #     else:
-        #         return False
+        
 
     '''
     looks into all the possible moves a player can take in a certain state
@@ -151,24 +111,18 @@ class state:
     def expandStates(self):
         possibleStates = set()
         playerMoves = set()
-        # print("here")
         possibleStates.add(self)
 
         for i in range(len(self.players[self.turn].hands)):
-            # if(0 < self.players[self.turn].hands[i]):
                 for j in range(len(self.players[self.turn].hands)):
-                    # if((self.players[self.turn].hands[i] not in playerMoves)):
                     oHand = self.players[self.turn].hands[i]
                     dHand = self.players[(self.turn + 1) % 2].hands[j]
                     tuple = (oHand, dHand)
                     if tuple not in playerMoves and oHand != 0 and dHand != 0:
                         playerMoves.add(tuple)
-                        # playerMoves.add(self.players[self.turn].hands[i])
                         copy = self.copyState()
 
-                        # print("turn before move " + str(copy.turn))
                         copy.makeTurn(i, j, False)
-                        # print("turn after move "  + str(copy.turn))
 
 
                         copy.score = copy.evaluateScore()
@@ -178,14 +132,13 @@ class state:
                             copy.uct = copy.calcUct()
                             possibleStates.add(copy)
         copy = self.copyState()
-        if(not copy.allSame()): #maybe need to change so doesn't affect MCTS
-            # print("turn before split " + str(copy.turn))
+        if(not copy.allSame()): 
+           
 
             copy.makeTurn(0,0, True)
-            # print("turn after split"  + str(copy.turn))
 
 
-            copy.evaluateScore() #changed from 1 to 0.... is this change for the next state?
+            copy.evaluateScore() 
             if copy != self:
                 copy.parent = self
                 copy.uct = copy.calcUct()
@@ -223,26 +176,19 @@ class state:
     def makeTurn(self, handM, handR, split):
         if split:
 
-            # liveHand = 0
-            #
-            # liveHand = liveHands(self.players[self.turn].hands)
+            
 
             total = sum(self.players[self.turn].hands)
 
-            # value = int (total / liveHand)
             value = int(total/ self.players[self.turn].numHands)
-            # leftover = total % liveHand
             leftover = total % self.players[self.turn].numHands
 
             for i in range(len(self.players[self.turn].hands)):
-                # if self.players[self.turn].hands[i] != 0:
-                #     self.players[self.turn].hands[i] = value
+            
                 self.players[self.turn].hands[i] = value
             j = 0
             while(leftover > 0):
-                # if self.players[self.turn].hands[j] != 0:
-                #     self.players[self.turn].hands[j] += 1
-                #     leftover-= 1
+                
                 self.players[self.turn].hands[j] += 1
                 leftover-= 1
                 j+=1
@@ -272,7 +218,7 @@ class state:
     Evaluates the uct score of a given state
     '''
     def calcUct(self):
-        coeff = .5
+        coeff = .4
         value = 0
         value_2 = 0
         #if a state doesn't have a parent, also uses it in ABmove
@@ -293,7 +239,3 @@ class state:
             score = value + coeff * value_2
             return score
 
-'''
-terminal 1: ln with .5
-terminal 2: ln with .9
-'''

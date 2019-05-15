@@ -47,7 +47,6 @@ def ABMove(state, depth, alpha, beta, depthLimit, allStates,visited):
             bestVal = float("-inf")
             for Nstate in nStates:
                 result = ABMove(Nstate, depth+1, alpha, beta, depthLimit, allStates,visited)
-                # print(str(result[1]) + ", " + str(bestVal))
                 if(result[1] > bestVal):
                     bestVal = result[1]
                     bestState = Nstate
@@ -55,8 +54,7 @@ def ABMove(state, depth, alpha, beta, depthLimit, allStates,visited):
                     alpha = bestVal
                 if beta <= alpha:
                     break
-                # # else:
-                # allStates.add(Nstate)
+                
 
             return (bestState, bestVal, visited)
         else:
@@ -72,26 +70,19 @@ def ABMove(state, depth, alpha, beta, depthLimit, allStates,visited):
 
                 if(bestVal < beta):
                     beta = bestVal
-                # print("beta: "+str(beta))
                 if beta <= alpha:
-                    # print("here")
                     break
-                # else:
-                # allStates.add(Nstate)
-
-            # print(bestState)
-            # print(bestVal)
             return (bestState, bestVal, visited)
 
 '''
 Determine the best next move while implementing monte carlo tree search
 '''
 def mctsMove(root, maxStates):
-    root.parent = None #need to set this so it doesn't recurse back farther than it needs?
+    root.parent = None 
     root.selected = 1
     count = 0
     start_time = time.time()
-    root.states = [] #do we need to delete the states from the last player's turn?
+    root.states = [] 
     while resources_left(start_time, count, maxStates):
         leaf = traverse(root)
         simulation_result = rollout(leaf)
@@ -102,11 +93,8 @@ def mctsMove(root, maxStates):
 
 def resources_left(start_time, count, maxStates):
     current_time = time.time()
-    if count > maxStates: #idk how long to usecurrent_time > start_time + 60 or 
-        # if count > maxStates:
-        #     # print(str(count) + ", " + str(maxStates))
-        # else:
-        #     print("time")
+    if count > maxStates: #could add a time here if you want
+        
         return False
     return True
 
@@ -135,7 +123,7 @@ def best_child(root):
     return bc
 
 def traverse(state):
-    while isBoundary(state) == False: #need better criteria for deciding if
+    while isBoundary(state) == False: 
         selected_states = []
         for index in range(len(state.states)): #select all children that have been expanded upon
             if state.states[index].selected == 1:
@@ -165,8 +153,7 @@ def isBoundary(state):
                 if state.selected == 1: #then one of its states is part of the frontier and will be expanded
                     return False
             return True
-    else: #if it hasn't been selected, then something is messed up and should let us know
-        # print("here")
+    else: 
         return -1
 
 def rollout(start):
@@ -194,22 +181,12 @@ def rollout(start):
 
 def backpropogate(node, result):
     while node.parent != None:
-        # if node.selected == 1:
         node.wins += result
         node.visits += 1
         oldUct = node.uct
         node.uct = node.calcUct()
-        # print("old uct: " + str(oldUct) + ",  to: " + str(node.uct))
         node = node.parent
-    '''
-    RECURSION BACKPROPOGATE
-    if node.parent == None:
-        return
-    node.wins += result
-    node.visits += 1
-    node.uct = node.calcUct()
-    backpropogate(node.parent,result)
-    '''
+    
 def playGame(currentRoot , gameNum):
 
     count = 0
@@ -219,7 +196,6 @@ def playGame(currentRoot , gameNum):
     maxStates = float("inf")
 
     currentRoot = randomMoves(currentRoot)
-    # print(currentRoot)
     while(not currentRoot.checkWin()):
         if(currentRoot.turn == 0):
             visited = set()
@@ -229,27 +205,22 @@ def playGame(currentRoot , gameNum):
             p1Visit.update(allStates)
             if len(allStates) != 0:
                 maxStates = len(allStates)
-            # print(str(len(p1Visit)) + ", " + str(maxStates))
             totalStates += len(allStates)
             # print("MADE MOVE")
             # print(currentRoot)
-            # print(maxStates)
-            # print("_____")
-
+            
         else:
             p2Visit.add(currentRoot)
             # (currentRoot,score,allStates) = ABMove(currentRoot, 1,float("-inf"),float("inf"), 8, p2Visit)
+            # p2Visit.update(allStates)
+            # if len(allStates) != 0:
+            #     maxStates = len(allStates)
+            # totalStates += len(allStates)
             currentRoot = mctsMove(currentRoot, maxStates)
 
             # print("MADE MOVE")
             # print(currentRoot)
-            # print(len(allStates))
-            # p2Visit.update(allStates)
-            # maxStates = len(allStates)
-            # totalStates += len(allStates)
-            # print(len(allStates))
-            # print("______")
-
+            
 
 
         count+= 1
@@ -260,16 +231,10 @@ def playGame(currentRoot , gameNum):
             return 0,0
         # print()
     if(currentRoot.turn == 0):
-        # print(currentRoot)
-        print("Player 2 has won")
-        # print(len(allStates))
-        # print(totalStates / float(count))
+        # print("Player 2 has won")
         return 2,count
     else:
-        # print(currentRoot)
-        print("Player 1 has won")
-        # print(len(allStates))
-        # print(totalStates / float(count))
+        # print("Player 1 has won")
         return 1,count
 
 def randomMoves(currentRoot):
@@ -280,7 +245,6 @@ def randomMoves(currentRoot):
             currentRoot = random.choice(tuple(states))
 
 
-    # return currentRoot
 
     return currentRoot
 
@@ -291,82 +255,41 @@ def main():
     # randomMoves(gameT.root)
     # r = playGame(gameT.root, 1)
 
-    ##### ONE MOVE #####
-    # tree = gameTree(3,5)
-    # root = tree.root
-    # root.players[0].hands = [3,4,1]
-    # root.players[1].hands = [0,2,0]
-    # root.turn = 0
-    # p1Visit = set()
-    # root.states = root.expandStates()
-    # for state in root.states:
-    #     print(state)
-    #     print(state.score)
-
-    # (currentRoot,score,allStates) = ABMove(root, 1,float("-inf"),float("inf"),2 , p1Visit)
-    # currentRoot = mctsMove(root, float("inf"))
-
-    # print("MADE MOVE")
-    # print(currentRoot)
-    # print(currentRoot.score)
-
-
-    ##### PLAY AB GAME #####
+    ##### Bulk testing function #####
     results = open("results.txt","w")
-    params = [8,6,5,4,3,2]
-    # for hands in params:
-    #     header = "Playing with " + str(hands) " hands\n\n"
-    #     results.write(header)
-    winners = {"p1" : 0, "p2":0}
-    loops = 0
-    count = 0
-    games = 0
-    while games <= 29:
-    # for i in range(30):
-        print(games)
-        gameT = gameTree(3,5)
-        winner = playGame(gameT.root, games)
-
-        print("Player " + str(winner) + " won")
-        if(winner[0] == 1):
-            winners["p1"] += 1
-            count+= winner[1]
-        elif(winner[0] == 2):
-            winners["p2"] += 1
-            count+= winner[1]
-        else:
-            print("Caught in loop")
-            loops += 1
-            games -= 1 
-            pass
+    params = [3,4,5,6,7]
+    for fingers in params:
+        header = "Playing with " + str(fingers) + " hands\n"
+        results.write(header)
+        winners = {"p1" : 0, "p2":0}
+        loops = 0
+        count = 0
+        games = 0
+        while games <= 29:
+            gameT = gameTree(2,4)
+            winner = playGame(gameT.root, games)
+            if(winner[0] == 1):
+                winners["p1"] += 1
+                count+= winner[1]
+            elif(winner[0] == 2):
+                winners["p2"] += 1
+                count+= winner[1]
+            else:
+                print("Caught in loop")
+                loops += 1
+                games -= 1 
+                pass
+            
+            games += 1
+        results.write("AB won "+str(winners["p1"]) + " times\n")
+        results.write("MCTS won "+str(winners["p2"]) + " times\n")
+        results.write("MCTS won " + str(winners["p2"] / float(winners["p1"] + winners["p2"])) + " percent of the time\n\n")
+        
         print(winners["p2"] / float(winners["p1"] + winners["p2"]))
-        # time.sleep(3)
-        games += 1
-    results.write("AB won "+str(winners["p1"]) + " times\n")
-    results.write("MCTS won "+str(winners["p2"]) + " times\n")
-    results.write("MCTS won " + str(winners["p2"] / float(winners["p1"] + winners["p2"])) + " percent of the time\n")
-    print(count / float(30))
-    print(loops)
-    print(winners["p2"] / float(winners["p1"] + winners["p2"]))
+        print("_______")
     results.close()
 
-    #### TEST EXPANDSTATES() #####
-    # states = copy.expandStates()
-    # for state in states:
-    #     print(state)
-
-    ##### COLLECTION OF AB MOVES ######
-    # print("pre turn: " + str(copy.turn))
-    # nextState = ABMove(copy, 0,float("-inf"),float("inf"), 5)[0]
-    # print(nextState)
-    # print("post turn: " + str(nextState.turn))
-
-    # nextState = ABMove(nextState, 0,float("-inf"),float("inf"), 5)[0]
-    # print
-    # print(nextState)
-
     
-    #
     
 
     
