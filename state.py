@@ -5,7 +5,7 @@ import random
 from player import player
 #State has two players
 class state:
-    def __init__(self, player1, player2, turn, p=None): #need to add parent node to all states (ugh)
+    def __init__(self, player1, player2, turn, p=None): 
         self.players = [player1, player2]
         self.turn = turn
         self.states = []
@@ -24,31 +24,17 @@ class state:
     def __eq__(self, other):
         if other == None:
             return False
-        p1s1Hands = {}
-        p2s1Hands = {}
-        p1s2Hands = {}
-        p2s2Hands = {}
-        for hand in range(len(self.players[0].hands)):
-            if(self.players[0].hands[hand] in p1s1Hands):
-                p1s1Hands[self.players[0].hands[hand]] += 1
-            else:
-                p1s1Hands[self.players[0].hands[hand]] = 1
-            if(self.players[1].hands[hand] in p2s1Hands):
-                p2s1Hands[self.players[1].hands[hand]] += 1
-            else:
-                p2s1Hands[self.players[1].hands[hand]] = 1
-            if(other.players[0].hands[hand] in p1s2Hands):
-                p1s2Hands[other.players[0].hands[hand]] += 1
-            else:
-                p1s2Hands[other.players[0].hands[hand]] = 1
-            if(other.players[1].hands[hand] in p2s2Hands):
-                p2s2Hands[other.players[1].hands[hand]] += 1
-            else:
-                p2s2Hands[other.players[1].hands[hand]] = 1
-        if(p1s1Hands == p1s2Hands and p2s1Hands == p2s2Hands):
+        
+        selfh1 = set(self.players[0].hands)
+        selfh2 = set(self.players[1].hands)
+        otherh1 = set(other.players[0].hands)
+        otherh2 = set(other.players[1].hands)
+        
+        if (selfh1 - otherh1) == set() or (selfh2 - otherh2) == set():
             return True
         else:
             return False
+        
 
     def __hash__(self):
         return hash(tuple(self.players[0].hands)) + hash(tuple(self.players[1].hands))
@@ -63,10 +49,10 @@ class state:
         newPlayer2.hands = self.players[1].hands[:]
 
         newState = state(newPlayer1, newPlayer2, self.turn,self.parent)
-        newState.visits = 0 #self.visits #0
+        newState.visits = 0 
 
-        #does selected need to get changed?
-        newState.uct = newState.calcUct() #do you need to do this? idk
+      
+        newState.uct = newState.calcUct()
         return newState
 
 
@@ -110,6 +96,7 @@ class state:
 
         return score
 
+
     '''
     Checks to see if either player has won the game
 
@@ -152,6 +139,7 @@ class state:
                         copy = self.copyState()
 
                         copy.makeTurn(i, j, False)
+
                         copy.score = copy.evaluateScore()
 
                         if copy != self:
@@ -159,10 +147,12 @@ class state:
                             copy.uct = copy.calcUct()
                             possibleStates.add(copy)
         copy = self.copyState()
-        if(not copy.allSame()):
+        if(not copy.allSame()): 
+           
 
             # Adds a split move to possibleStates
             copy.makeTurn(0,0, True)
+
 
 
             copy.evaluateScore()
@@ -220,10 +210,11 @@ class state:
             leftover = total % self.players[self.turn].numHands
 
             for i in range(len(self.players[self.turn].hands)):
-
+            
                 self.players[self.turn].hands[i] = value
             j = 0
             while(leftover > 0):
+                
 
                 self.players[self.turn].hands[j] += 1
                 leftover-= 1
@@ -247,24 +238,24 @@ class state:
     Evaluates the uct score of a given state
     '''
     def calcUct(self):
-        coeff = .5
+        coeff = .4
         value = 0
         value_2 = 0
         #if a state doesn't have a parent, also uses it in ABmove
+        
         if self.parent == None:
             return 0
         else:
-
-            if self.visits == 0:
+            if self.visits == 0 or self.wins == 0:
                 value = 0
+            else: 
+                value = self.wins/self.visits
+            if self.visits == 0 or self.parent.visits == 0:
                 value_2 = 0
-            if self.parent.visits == 0:
-                value_2 = 0
-            if self.wins == 0:
-                value = 0
-            else:
-                value = self.wins /self.visits
+            else: 
+                value_2 = math.sqrt(math.log(self.parent.visits)/self.visits)
 
-                value_2 = math.sqrt(math.log10(self.parent.visits)/self.visits)
+                
             score = value + coeff * value_2
             return score
+
