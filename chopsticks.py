@@ -20,8 +20,21 @@ def expandTree(tree):
             stack.extend(currentRoot.expandStates())
     return allStates
 
-# Algorithm that takes in a state and will perform minimax with Alpha-beta pruning on it,
-# returning the ideal next state and the evaluated score of the state
+
+"""
+Runs the Minimax algorithm with Alpha-Beta pruning, or regular Minimax, with lines 55-58 and
+74-78 commented out
+
+Parameters : state - The current state of the game tree
+             depth - The current depth level on the game tree
+             alpha - The minimum score value a state needs to meet for the maximizing player to expand it
+             beta - The maximum score value a state needs to meet for the minimizing player to expand it
+             depthLimit - The depth limit Minimax is allowed to search to
+             allStates - A set of states Minimax has expanded on this turn
+Returns :    bestState - The state with the highest(or lowest depending on the turn) estimated value
+             bestVal - The estimated value of bestVal
+             allStates - A set of states Minimax has expanded on this turn
+"""
 def ABMove(state, depth, alpha, beta, depthLimit, allStates):
 
     if(depth == depthLimit):
@@ -54,16 +67,14 @@ def ABMove(state, depth, alpha, beta, depthLimit, allStates):
                     alpha = bestVal
                 if beta <= alpha:
                     break
-                # # else:
-                # allStates.add(Nstate)
+
 
             return (bestState, bestVal, allStates)
         else:
             bestVal = float("inf")
 
             for Nstate in states:
-                # print("Nstate")
-                # print(Nstate)
+
                 result = ABMove(Nstate, depth+1, alpha, beta, depthLimit, allStates)
 
                 if(result[1] < bestVal):
@@ -72,15 +83,10 @@ def ABMove(state, depth, alpha, beta, depthLimit, allStates):
 
                 if(bestVal < beta):
                     beta = bestVal
-                # print("beta: "+str(beta))
-                if beta <= alpha:
-                    # print("here")
-                    break
-                # else:
-                # allStates.add(Nstate)
 
-            # print(bestState)
-            # print(bestVal)
+                if beta <= alpha:
+                    break
+
             return (bestState, bestVal, allStates)
 
 '''
@@ -89,7 +95,7 @@ Determine the best next move while implementing monte carlo tree search
 def mctsMove(root, maxStates):
     count = 0
     start_time = time.time()
-    root.states = [] #do we need to delete the states from the last player's turn?
+    root.states = []
     while resources_left(start_time, count, maxStates):
         leaf = traverse(root)
         simulation_result = rollout(leaf)
@@ -100,8 +106,8 @@ def mctsMove(root, maxStates):
 
 def resources_left(start_time, count, maxStates):
     current_time = time.time()
-    # print(current_time)
-    if current_time > start_time + 3 or count > maxStates: #idk how long to use
+
+    if current_time > start_time + 3 or count > maxStates:
         return False
     return True
 
@@ -176,6 +182,16 @@ def backpropogate(node, result):
     node.visits += 1
     node.uct = node.calcUct()
     backpropogate(node.parent,result)
+
+"""
+Runs a game of chopsticks with either Alpha-Beta or MCTS playerMoves
+
+Parameters : currentRoot - The initial root of the game tree, used to set hand and finger parameters
+             gameNum - Number of the game in testing, intitially 0, used to keep track of testing
+
+Returns : 1 if Red player has won, 2 if Blue player has won
+          count - Number of turns it took for the game to finish
+"""
 def playGame(currentRoot , gameNum):
 
     count = 0
@@ -184,8 +200,7 @@ def playGame(currentRoot , gameNum):
     totalStates = 0
     maxStates = float("inf")
 
-    # currentRoot = randomMoves(currentRoot)
-    # print(currentRoot)
+
     while(not currentRoot.checkWin()):
         if(currentRoot.turn == 0):
 
@@ -197,7 +212,7 @@ def playGame(currentRoot , gameNum):
             maxStates = len(allStates)
             print(maxStates)
             totalStates += len(allStates)
-            # print("_____")
+
 
         else:
             p2Visit.add(currentRoot)
@@ -208,31 +223,36 @@ def playGame(currentRoot , gameNum):
             print(currentRoot)
             print(len(allStates))
             p2Visit.update(allStates)
-            # print(len(allStates))
-            # print("______")
+
 
 
 
         count+= 1
 
         print(count)
-        # print(gameNum)
+
         if(count > 10000):
             return 0,0
-        # print()
+
     if(currentRoot.turn == 0):
-        # print(currentRoot)
+        print(currentRoot)
         print("Player 2 has won")
-        # print(len(allStates))
+
         print(totalStates / float(count))
         return 2,count
     else:
-        # print(currentRoot)
+        print(currentRoot)
         print("Player 1 has won")
-        # print(len(allStates))
+
         print(totalStates / float(count))
         return 1,count
+"""
+Has each player perfom 3 random moves in order to scramble the starting game state
 
+Parameters : currentRoot - The starting state of the game
+
+Returns : currentRoot - The new random state of the game
+"""
 def randomMoves(currentRoot):
     for i in range(5):
         states = currentRoot.expandStates()
@@ -248,29 +268,7 @@ def randomMoves(currentRoot):
     return currentRoot
 
 def main():
-    # gameT = gameTree(5,3)
-    #
-    #
-    # ##### PLAY AB GAME #####
-    # winner = playGame(gameT.root,0)
-    #
-    # print(winner[1])
-    #
-    # gameT = gameTree(5,5)
-    #
-    #
-    # ##### PLAY AB GAME #####
-    # winner = playGame(gameT.root,0)
-    #
-    # print(winner[1])
 
-    # gameT = gameTree(5,7)
-    #
-    #
-    # ##### PLAY AB GAME #####
-    # winner = playGame(gameT.root,0)
-    #
-    # print(winner[1])
     gameT = gameTree(5,5)
 
 
@@ -302,55 +300,8 @@ def main():
     # print(winners["p1"] / float(winners["p1"] + winners["p2"]))
     # print(count / float(30))
     # print(loops)
-    #### TEST EXPANDSTATES() #####
-    # states = copy.expandStates()
-    # for state in states:
-    #     print(state)
-
-    ##### COLLECTION OF AB MOVES ######
-    # print("pre turn: " + str(copy.turn))
-    # nextState = ABMove(copy, 0,float("-inf"),float("inf"), 5)[0]
-    # print(nextState)
-    # print("post turn: " + str(nextState.turn))
-
-    # nextState = ABMove(nextState, 0,float("-inf"),float("inf"), 5)[0]
-    # print
-    # print(nextState)
-
-    ##### TESTING MAKE MOVE ANYWAYS ###### (this works, but why doesn't it change with evaluate state?)
-    # print(copy)
-    # copy.makeTurn(0,0,False)
-    # print(copy)
 
 
 
-    # print(gameT.root)
-
-
-    # gameT.allStates.add(gameT.root)
-    # state = ABMove(gameT.root, 0, float("-inf"), float("inf"), 10)[0]
-    # state = ABMove(state,0, float("-inf"), float("inf"), 10)[0]
-    # print(state)
-
-    # gameT.root.states = gameT.root.expandStates()
-
-    # for state in gameT.root.states:
-    #     print(state)
-    #     print(state.score)
-
-
-    #
-    # print("_____")
-    #
-    #     if(state.checkWin()):
-    #
-    #         print("_______")
-    #         print("Victory")
-    #         print("_______")
-    #
-    #
-    #
-    #
-    # print(len(gameT.allStates))
 if __name__ == "__main__":
     main()

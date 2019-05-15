@@ -71,7 +71,11 @@ class state:
 
 
     '''
-    score a state we need to revisit this...... I don't think we need the turn parameter
+    Evaluates the given state of the game and provides a score for that state
+
+    Parameters : self - any state
+
+    Returns : score - The estimated value of that state
     '''
     def evaluateScore(self):
         score = 0
@@ -91,18 +95,7 @@ class state:
                 else:
                     score = self.players[1].numHands * -10000
 
-        # canKill = 0
-        # knockoutMoves = set()
-        # for i in self.players[0].hands:
-        #     for j in self.players[1].hands:
-        #         tuple = (i,j)
-        #         if(i+j >= self.players[0].numFingers and tuple not in knockoutMoves):
-        #             knockoutMoves.add(tuple)
-        #             canKill += 1
-        # if(self.turn == 0):
-        #     score += 200 * canKill
-        # else:
-        #     score -= 200 * canKill
+
         for i in self.players[0].hands:
             if(i == 0):
                 score -= 100
@@ -118,7 +111,11 @@ class state:
         return score
 
     '''
-    check if a player has won the game
+    Checks to see if either player has won the game
+
+    Parameters : self - a state
+
+    Returns : True if the game is over, False if not
     '''
     def checkWin(self):
         p1sum = sum(self.players[0].hands)
@@ -127,43 +124,34 @@ class state:
             return True
         else:
             return False
-        # if(self.turn == 0):
-        #     if sum(self.players[1].hands) == 0:
-        #         return True
-        #     else:
-        #         return False
-        # else:
-        #     if sum(self.players[0].hands) == 0:
-        #         return True
-        #     else:
-        #         return False
+
 
     '''
-    looks into all the possible moves a player can take in a certain state
+    Expands all of the possible next moves based on the given state
+
+    Parameters : self - any state
+
+    Returns : possibleStates - a set of states that represent the players possible moves
     '''
     def expandStates(self):
         possibleStates = set()
         playerMoves = set()
-        # print("here")
+
         possibleStates.add(self)
 
         for i in range(len(self.players[self.turn].hands)):
-            # if(0 < self.players[self.turn].hands[i]):
                 for j in range(len(self.players[self.turn].hands)):
-                    # if((self.players[self.turn].hands[i] not in playerMoves)):
                     oHand = self.players[self.turn].hands[i]
                     dHand = self.players[(self.turn + 1) % 2].hands[j]
                     tuple = (oHand, dHand)
+                    # Prevents moves that are essentially the same move from being
+                    # represented more than once. If the attacking hand and
+                    # defending hands have the same value it is considered the same move
                     if tuple not in playerMoves and oHand != 0 and dHand != 0:
                         playerMoves.add(tuple)
-                        # playerMoves.add(self.players[self.turn].hands[i])
                         copy = self.copyState()
 
-                        # print("turn before move " + str(copy.turn))
                         copy.makeTurn(i, j, False)
-                        # print("turn after move "  + str(copy.turn))
-
-
                         copy.score = copy.evaluateScore()
 
                         if copy != self:
@@ -171,14 +159,13 @@ class state:
                             copy.uct = copy.calcUct()
                             possibleStates.add(copy)
         copy = self.copyState()
-        if(not copy.allSame()): #maybe need to change so doesn't affect MCTS
-            # print("turn before split " + str(copy.turn))
+        if(not copy.allSame()):
 
+            # Adds a split move to possibleStates
             copy.makeTurn(0,0, True)
-            # print("turn after split"  + str(copy.turn))
 
 
-            copy.evaluateScore() #changed from 1 to 0.... is this change for the next state?
+            copy.evaluateScore()
             if copy != self:
                 copy.parent = self
                 copy.uct = copy.calcUct()
@@ -190,6 +177,10 @@ class state:
 
     '''
     Tests to see if all of a player's hands are the same
+
+    Parameters : self - any state
+
+    Returns : True if all hands are the same, False otherwise
     '''
     def allSame(self):
 
@@ -212,30 +203,28 @@ class state:
     Encodes making a turn, if they decide to split, distribute the number of fingers
     evenly among the hands of the player. If they decide to make the move, the receiving
     player will take the move
+
+    Parameters : self - any state
+                 handM - the offensive players hand
+                 handR - the defending players hand
+                 split - Boolean as to whether or not the move is a split
     '''
     def makeTurn(self, handM, handR, split):
         if split:
 
-            # liveHand = 0
-            #
-            # liveHand = liveHands(self.players[self.turn].hands)
+
 
             total = sum(self.players[self.turn].hands)
 
-            # value = int (total / liveHand)
             value = int(total/ self.players[self.turn].numHands)
-            # leftover = total % liveHand
             leftover = total % self.players[self.turn].numHands
 
             for i in range(len(self.players[self.turn].hands)):
-                # if self.players[self.turn].hands[i] != 0:
-                #     self.players[self.turn].hands[i] = value
+
                 self.players[self.turn].hands[i] = value
             j = 0
             while(leftover > 0):
-                # if self.players[self.turn].hands[j] != 0:
-                #     self.players[self.turn].hands[j] += 1
-                #     leftover-= 1
+
                 self.players[self.turn].hands[j] += 1
                 leftover-= 1
                 j+=1
@@ -254,13 +243,6 @@ class state:
             self.turn = 0
 
 
-    def liveHands(hands):
-          count = 0
-          for hand in hands:
-
-              if hand != 0:
-                  count+=1
-          return count
     '''
     Evaluates the uct score of a given state
     '''
