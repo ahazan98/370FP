@@ -89,7 +89,12 @@ def ABMove(state, depth, alpha, beta, depthLimit, allStates):
             return (bestState, bestVal, visited)
 
 '''
-Determine the best next move while implementing monte carlo tree search
+Runs the Monte Carlo Tree Search Algorithm starting from a certain state
+
+Parameters: root - the state to start at
+            maxStates - the maximum number of states the algorithm is allowed to expand its frontier to
+
+Returns: The next state that MCTS has determined to be the best move
 '''
 def mctsMove(root, maxStates):
     root.parent = None 
@@ -106,6 +111,16 @@ def mctsMove(root, maxStates):
 
     return best_child(root) 
 
+'''
+Tells the caller if MCTS Has any resources left
+
+Parameters: start_time - the time the algorithm started in case you are constraining for time
+            count - the number of states that have already been stored
+            maxStates - the maximum number of states MCTS is allowed to explore
+
+Returns: True if MCTS has resources left, False if it does not
+'''
+
 def resources_left(start_time, count, maxStates):
     current_time = time.time()
     if count > maxStates: #could add a time here if you want
@@ -113,6 +128,14 @@ def resources_left(start_time, count, maxStates):
 
         return False
     return True
+
+'''
+Selects the child state of the parent that has the greatest UCT value, or one that results in the current player winning
+
+Parameters: root - the state that is choosing its best child
+
+Returns: the state that represents the best child
+'''
 
 def best_child(root):
     bc = root.states[0]
@@ -138,6 +161,14 @@ def best_child(root):
                 bc = state
     return bc
 
+'''
+Navigates down the explored frontier, selecting the child with the highest UCT value, until it gets to the edge of the frontier
+
+Parameters: state - the state that the traversal is starting at
+
+Returns: Either a state that is in the frontier that results in a win or a random child of a state that is on the edge of the selected frontier, that is now added to the frontier
+'''
+
 def traverse(state):
     while isBoundary(state) == False: 
         selected_states = []
@@ -158,7 +189,13 @@ def traverse(state):
         rand_child = random.randint(0,len(state.states)-1)
         state.states[rand_child].selected = 1
         return state.states[rand_child] 
+'''
+Tells the caller if the state in question is on the boundary of the frontier or not
 
+Parameters: state - the state in quesiton about whether it is on the boundary of the frontier or not
+
+Returns: True if the state is one the boundary, False if it is not on the boundary, and -1 if the state is unexplored
+'''
 def isBoundary(state):
 
     if state.selected == 1: #if part of frontier
@@ -171,6 +208,13 @@ def isBoundary(state):
             return True
     else: 
         return -1
+'''
+Runs a simulation game where random moves are chosen until a terminal state is reached
+
+Parameters: start - the state where the simulation starts
+
+Returns: 1 if it results in a win for the start node, and 0 if it results in a loss for the start node
+'''
 
 def rollout(start):
     curr = start
@@ -194,6 +238,12 @@ def rollout(start):
             return 1
         else:
             return 0
+'''
+Backtracks through the game tree, updating the visits, wins, and UCT values of the states on the path
+
+Parameters: node - the state that produced the result to be backtracked
+            result - whether the starting state was a win (1) or a loss (0)
+'''
 
 def backpropogate(node, result):
     while node.parent != None:
