@@ -9,15 +9,20 @@ class player:
             self.hands.append(1)
 
     '''
-    player receives a move on their hand
+    Player receives a move on their hand
+
+    Parameters : self - The player receiving the move
+                 hand - The hand being hit
+                 number - The number of fingers the other player hit with
     '''
     def receiveMove(self, hand, number):
         if self.hands[hand] == 0:
 
             return
 
-        # newVal = (self.hands[hand] + number)
-        newVal = (self.hands[hand] + number) % self.numFingers #maybe include spillover?
+        # If the sum of the move being made is over numFingers then the player
+        # takes the remainder of the move - numFingers
+        newVal = (self.hands[hand] + number) % self.numFingers
         if(newVal >= self.numFingers):
             newVal = 0
         self.hands[hand] = newVal
